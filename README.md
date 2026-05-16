@@ -1,9 +1,9 @@
-# 📄 PDF Merger — Smart Document Tool
-### 2nd Year College Project | Built with Python Flask + pypdf
+# PDF Merger (Built with Python Flask + pypdf)
+### Live on --- <https://pdf-merger-i3om.onrender.com/>
 
 ---
 
-## 🚀 What This Project Does
+## What This Project Does
 
 A web application that lets you **upload two PDF files** and merge them
 in any order or combination using **simple text commands**.
@@ -23,7 +23,7 @@ in any order or combination using **simple text commands**.
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 - **Backend**: Python 3.10+, Flask, pypdf
 - **Frontend**: Vanilla HTML/CSS/JavaScript (no frameworks needed)
@@ -31,7 +31,7 @@ in any order or combination using **simple text commands**.
 
 ---
 
-## ⚙️ Setup Instructions
+## Setup Instructions
 
 ### 1. Prerequisites
 Make sure you have **Python 3.10+** installed.
@@ -40,14 +40,11 @@ Check with: `python --version`
 ### 2. Clone / Download the project
 ```
 pdf_merger/
-├── app.py                  ← Flask backend (main logic)
-├── requirements.txt        ← Python dependencies
-├── README.md               ← This file
-├── static/
-│   ├── uploads/            ← Temp folder for uploaded PDFs
-│   └── outputs/            ← Merged PDFs saved here
+├── app.py                  
+├── requirements.txt        
+├── README.md               
 └── templates/
-    └── index.html          ← Frontend UI
+    └── index.html          
 ```
 
 ### 3. Install Dependencies
@@ -68,7 +65,7 @@ http://localhost:5000
 
 ---
 
-## 🎯 How to Use
+## How to Use
 
 1. **Upload** — Drag and drop (or click to browse) two PDF files into the upload boxes.
 2. **Analyse** — Click "Analyse Both PDFs" to upload them to the server.
@@ -78,7 +75,7 @@ http://localhost:5000
 
 ---
 
-## 📁 Project Structure Explained
+## Project Structure Explained
 
 ### `app.py`
 The Flask backend. Contains:
@@ -102,28 +99,8 @@ Single-page UI with:
 - Status messages and result card
 - Download link
 
----
 
-## 💡 Possible Extensions (for viva / extras)
-
-- [ ] Support merging more than 2 PDFs
-- [ ] Add a page preview (thumbnail) before merging
-- [ ] Support password-protected PDFs
-- [ ] Add page reordering via drag-and-drop UI
-- [ ] Generate a merge history / log
-- [ ] Deploy to cloud (Render, Railway, PythonAnywhere — all free tiers)
-
----
-
-## 🐛 Common Issues
-
-| Problem | Fix |
-|---------|-----|
-| `ModuleNotFoundError: flask` | Run `pip install -r requirements.txt` |
-| Port 5000 already in use | Change `port=5000` to `port=5001` in app.py |
-| File upload fails | Check that `static/uploads/` folder exists |
-| Empty output PDF | Check your page range — ensure page numbers exist in the PDF |
-
----
-
-*Built with ❤️ using Python Flask and pypdf*
+## Author -
+- Vaibhav Agarwal
+- Live on --- <https://pdf-merger-i3om.onrender.com/>
+- Linkedin --- https://www.linkedin.com/in/vaibhavagarwal46
