@@ -1,5 +1,4 @@
-# PDF Merger
-### Built with Python Flask + pypdf
+# PDF Merger ###(Built with Python Flask + pypdf)
 
 ---
 
@@ -100,6 +99,6 @@ Single-page UI with:
 - Download link
 
 
-*Author -
-Vaibhav Agarwal
-https://www.linkedin.com/in/vaibhavagarwal46
+## Author -
+- Vaibhav Agarwal
+- https://www.linkedin.com/in/vaibhavagarwal46
