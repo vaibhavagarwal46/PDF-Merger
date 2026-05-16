@@ -36,6 +36,12 @@
       padding: 0;
     }
 
+    /* Strict overflow prevention for mobile */
+    html, body {
+      max-width: 100vw;
+      overflow-x: hidden;
+    }
+
     body {
       background-color: var(--bg-dark);
       background-image:
@@ -45,8 +51,6 @@
       font-family: 'Outfit', sans-serif;
       min-height: 100vh;
       width: 100%;
-      max-width: 100vw;
-      overflow-x: hidden;
       perspective: 1000px;
     }
 
@@ -93,6 +97,7 @@
       z-index: 10;
       max-width: 1400px;
       margin: 0 auto;
+      width: 100%;
     }
 
     .logo {
@@ -143,6 +148,7 @@
       display: flex;
       flex-direction: column;
       align-items: center;
+      width: 100%;
     }
 
     .hero h1 {
@@ -197,6 +203,7 @@
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
       transform-style: preserve-3d;
       width: 100%;
+      max-width: 100%; /* Prevents stretching */
     }
 
     @media (hover: hover) and (pointer: fine) {
@@ -296,7 +303,7 @@
       font-size: 0.95rem;
       color: var(--success);
       font-weight: 600;
-      word-break: break-all;
+      word-wrap: break-word; /* Allows long filenames to break safely */
       margin-top: 12px;
       text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
       text-align: center;
@@ -388,6 +395,7 @@
 
     textarea#command {
       width: 100%;
+      max-width: 100%;
       background: rgba(0, 0, 0, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 12px;
@@ -630,10 +638,14 @@
     }
 
     .table-container {
+      width: 100%;
+      max-width: 100%;
       overflow-x: auto;
+      -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
       border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.05);
       transform: translateZ(10px);
+      display: block; /* crucial for allowing internal scroll */
     }
 
     table {
@@ -701,11 +713,12 @@
 
     /* Tablet and Small Laptops */
     @media (max-width: 900px) {
+      /* Change from Grid to Flex to prevent content blowout */
       main { 
-        grid-template-columns: 1fr; 
-      }
-      .command-card, .result-card, .ref-card { 
-        grid-column: 1; 
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        max-width: 100%;
       }
     }
 
@@ -836,7 +849,7 @@
       </div>
     </div>
 
-    <div style="grid-column: 1 / -1; width: 100%;">
+    <div style="width: 100%;">
       <button class="btn-upload" id="upload-btn" onclick="uploadFiles()" disabled style="margin-top: 0;">
         Analyse Documents
       </button>
