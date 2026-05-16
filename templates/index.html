@@ -3,7 +3,8 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#050507" />
   <meta name="description" content="A premium 3D PDF merging tool">
   <title>PDF Merger — Premium Document Tool</title>
   <link
@@ -43,6 +44,8 @@
       color: var(--text-main);
       font-family: 'Outfit', sans-serif;
       min-height: 100vh;
+      width: 100%;
+      max-width: 100vw;
       overflow-x: hidden;
       perspective: 1000px;
     }
@@ -82,12 +85,14 @@
 
     /* ── Header ── */
     header {
-      padding: 40px 60px 0;
+      padding: 40px 5% 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: relative;
       z-index: 10;
+      max-width: 1400px;
+      margin: 0 auto;
     }
 
     .logo {
@@ -97,7 +102,7 @@
     }
 
     .logo-title {
-      font-size: 2.5rem;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
       font-weight: 700;
       letter-spacing: 0.02em;
       background: linear-gradient(135deg, #fff 0%, #a5a5a5 100%);
@@ -107,7 +112,7 @@
     }
 
     .logo-sub {
-      font-size: 0.9rem;
+      font-size: clamp(0.75rem, 2vw, 0.9rem);
       color: var(--text-secondary);
       background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
       -webkit-background-clip: text;
@@ -127,14 +132,13 @@
       letter-spacing: 0.05em;
       backdrop-filter: blur(10px);
       box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 4px 15px rgba(0, 0, 0, 0.2);
-      white-space: nowrap;
     }
 
     /* ── Hero ── */
     .hero {
       position: relative;
       z-index: 10;
-      padding: 60px 60px 40px;
+      padding: 60px 5% 40px;
       text-align: center;
       display: flex;
       flex-direction: column;
@@ -160,7 +164,7 @@
 
     .hero p {
       color: var(--text-muted);
-      font-size: 1.1rem;
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
       max-width: 600px;
       line-height: 1.6;
       font-weight: 300;
@@ -170,12 +174,13 @@
     main {
       position: relative;
       z-index: 10;
-      padding: 0 60px 80px;
+      padding: 0 5% 80px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 32px;
       max-width: 1300px;
       margin: 0 auto;
+      width: 100%;
     }
 
     /* ── 3D Glass Cards ── */
@@ -191,6 +196,7 @@
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
       transform-style: preserve-3d;
+      width: 100%;
     }
 
     @media (hover: hover) and (pointer: fine) {
@@ -236,6 +242,11 @@
       position: relative;
       background: rgba(0, 0, 0, 0.2);
       transform: translateZ(20px);
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
     }
 
     .upload-zone:hover,
@@ -275,19 +286,20 @@
     }
 
     .upload-text {
-      font-size: 1rem;
+      font-size: 0.95rem;
       color: var(--text-muted);
       font-weight: 400;
     }
 
     .upload-filename {
       display: none;
-      font-size: 1rem;
+      font-size: 0.95rem;
       color: var(--success);
       font-weight: 600;
       word-break: break-all;
       margin-top: 12px;
       text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+      text-align: center;
     }
 
     .upload-pages {
@@ -364,7 +376,7 @@
     }
 
     .command-title {
-      font-size: 1.5rem;
+      font-size: clamp(1.2rem, 3vw, 1.5rem);
       font-weight: 700;
       letter-spacing: 0.05em;
     }
@@ -381,7 +393,7 @@
       border-radius: 12px;
       color: var(--accent-secondary);
       font-family: 'DM Mono', monospace;
-      font-size: 1.1rem;
+      font-size: clamp(0.95rem, 2vw, 1.1rem);
       padding: 20px;
       resize: vertical;
       min-height: 100px;
@@ -436,7 +448,7 @@
       background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
       color: white;
       border: none;
-      font-size: 1.2rem;
+      font-size: clamp(1rem, 2vw, 1.2rem);
       padding: 20px;
       box-shadow: 0 10px 30px rgba(112, 0, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -540,7 +552,7 @@
     }
 
     .result-title {
-      font-size: 2rem;
+      font-size: clamp(1.5rem, 4vw, 2rem);
       font-weight: 700;
       color: var(--success);
       display: flex;
@@ -580,6 +592,7 @@
     .btn-download {
       display: inline-flex;
       align-items: center;
+      justify-content: center;
       gap: 10px;
       padding: 14px 32px;
       background: var(--success);
@@ -675,7 +688,7 @@
       position: relative;
       z-index: 10;
       text-align: center;
-      padding: 30px;
+      padding: 30px 5%;
       font-size: 0.8rem;
       color: var(--text-muted);
       border-top: 1px solid rgba(255, 255, 255, 0.05);
@@ -685,51 +698,94 @@
     }
 
     /* ── RESPONSIVE MEDIA QUERIES ── */
+
+    /* Tablet and Small Laptops */
     @media (max-width: 900px) {
-      main { grid-template-columns: 1fr; }
-      .command-card, .result-card, .ref-card { grid-column: 1; }
+      main { 
+        grid-template-columns: 1fr; 
+      }
+      .command-card, .result-card, .ref-card { 
+        grid-column: 1; 
+      }
     }
 
+    /* Mobile Phones */
     @media (max-width: 600px) {
       header { 
-        padding: 20px 15px 0; 
         flex-direction: column; 
-        gap: 15px; 
         text-align: center;
+        gap: 12px;
+        padding-top: 30px;
       }
-      
+
       .logo { 
         flex-direction: column; 
         align-items: center; 
         gap: 4px;
       }
-
-      .logo-title { font-size: 2rem; }
       
-      .hero { padding: 30px 15px; }
-      .hero p { font-size: 1rem; }
+      .hero { 
+        padding: 40px 5% 20px; 
+      }
 
       main { 
-        padding: 0 15px 40px; 
         gap: 20px; 
       }
 
-      .card { padding: 20px; }
+      .card { 
+        padding: 24px 20px; 
+      }
 
-      .command-title { font-size: 1.25rem; }
-      .btn-merge { font-size: 1rem; padding: 16px; }
+      .upload-zone {
+        padding: 30px 15px;
+      }
 
-      .result-title { font-size: 1.5rem; }
+      .command-header {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+
+      .presets {
+        justify-content: center;
+      }
+
+      .result-header {
+        flex-direction: column;
+        align-items: stretch;
+        text-align: center;
+      }
+
+      .result-title {
+        justify-content: center;
+        margin-bottom: 10px;
+      }
+
       .result-meta { 
         flex-direction: column; 
         gap: 16px; 
+        align-items: center;
       }
       
-      .btn-download { width: 100%; justify-content: center; }
+      .btn-download { 
+        width: 100%; 
+      }
       
-      tbody td { padding: 12px 10px; }
+      tbody td { 
+        padding: 12px 10px; 
+      }
       
-      .bg-shape { display: none; } /* Better performance on mobile */
+      /* Hide heavy animations on tiny screens for better performance */
+      .bg-shape { 
+        display: none; 
+      } 
+    }
+
+    /* Extra Small Phones (e.g. iPhone SE) */
+    @media (max-width: 400px) {
+      .card { padding: 20px 15px; }
+      .upload-icon { font-size: 2.5rem; }
+      textarea#command { padding: 15px; }
+      .btn-merge { padding: 16px; }
     }
   </style>
 </head>
@@ -780,7 +836,7 @@
       </div>
     </div>
 
-    <div style="grid-column: 1 / -1;">
+    <div style="grid-column: 1 / -1; width: 100%;">
       <button class="btn-upload" id="upload-btn" onclick="uploadFiles()" disabled style="margin-top: 0;">
         Analyse Documents
       </button>
