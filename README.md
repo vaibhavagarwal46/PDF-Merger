@@ -1,4 +1,4 @@
-# PDF Merger ###(Built with Python Flask + pypdf)
+# PDF Merger (Built with Python Flask + pypdf)
 
 ---
 
