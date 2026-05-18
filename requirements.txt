@@ -1,6 +1,7 @@
 flask>=3.0.0
 pypdf>=4.0.0
 werkzeug>=3.0.0
+gunicorn>=21.2.0
 Pillow>=10.0.0
 # For DOCX/PPTX → PDF conversion, LibreOffice must be installed on the system:
 #   Ubuntu/Debian: sudo apt install libreoffice
