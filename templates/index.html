@@ -3,8 +3,7 @@
 
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <meta name="theme-color" content="#050507" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta name="description" content="A premium 3D PDF merging tool">
   <title>PDF Merger — Premium Document Tool</title>
   <link
@@ -36,12 +35,6 @@
       padding: 0;
     }
 
-    /* Strict overflow prevention for mobile */
-    html, body {
-      max-width: 100vw;
-      overflow-x: hidden;
-    }
-
     body {
       background-color: var(--bg-dark);
       background-image:
@@ -50,7 +43,7 @@
       color: var(--text-main);
       font-family: 'Outfit', sans-serif;
       min-height: 100vh;
-      width: 100%;
+      overflow-x: hidden;
       perspective: 1000px;
     }
 
@@ -83,21 +76,25 @@
     }
 
     @keyframes float {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-30px) scale(1.05); }
+
+      0%,
+      100% {
+        transform: translateY(0) scale(1);
+      }
+
+      50% {
+        transform: translateY(-30px) scale(1.05);
+      }
     }
 
     /* ── Header ── */
     header {
-      padding: 40px 5% 0;
+      padding: 40px 60px 0;
       display: flex;
       align-items: center;
       justify-content: space-between;
       position: relative;
       z-index: 10;
-      max-width: 1400px;
-      margin: 0 auto;
-      width: 100%;
     }
 
     .logo {
@@ -107,7 +104,7 @@
     }
 
     .logo-title {
-      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      font-size: 2.5rem;
       font-weight: 700;
       letter-spacing: 0.02em;
       background: linear-gradient(135deg, #fff 0%, #a5a5a5 100%);
@@ -117,7 +114,7 @@
     }
 
     .logo-sub {
-      font-size: clamp(0.75rem, 2vw, 0.9rem);
+      font-size: 0.9rem;
       color: var(--text-secondary);
       background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
       -webkit-background-clip: text;
@@ -137,18 +134,18 @@
       letter-spacing: 0.05em;
       backdrop-filter: blur(10px);
       box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 4px 15px rgba(0, 0, 0, 0.2);
+      white-space: nowrap;
     }
 
     /* ── Hero ── */
     .hero {
       position: relative;
       z-index: 10;
-      padding: 60px 5% 40px;
+      padding: 60px 60px 40px;
       text-align: center;
       display: flex;
       flex-direction: column;
       align-items: center;
-      width: 100%;
     }
 
     .hero h1 {
@@ -170,7 +167,7 @@
 
     .hero p {
       color: var(--text-muted);
-      font-size: clamp(0.95rem, 2vw, 1.1rem);
+      font-size: 1.1rem;
       max-width: 600px;
       line-height: 1.6;
       font-weight: 300;
@@ -180,13 +177,12 @@
     main {
       position: relative;
       z-index: 10;
-      padding: 0 5% 80px;
+      padding: 0 60px 80px;
       display: grid;
       grid-template-columns: 1fr 1fr;
       gap: 32px;
       max-width: 1300px;
       margin: 0 auto;
-      width: 100%;
     }
 
     /* ── 3D Glass Cards ── */
@@ -202,8 +198,6 @@
       box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
       transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
       transform-style: preserve-3d;
-      width: 100%;
-      max-width: 100%; /* Prevents stretching */
     }
 
     @media (hover: hover) and (pointer: fine) {
@@ -249,11 +243,6 @@
       position: relative;
       background: rgba(0, 0, 0, 0.2);
       transform: translateZ(20px);
-      width: 100%;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      justify-content: center;
     }
 
     .upload-zone:hover,
@@ -293,20 +282,19 @@
     }
 
     .upload-text {
-      font-size: 0.95rem;
+      font-size: 1rem;
       color: var(--text-muted);
       font-weight: 400;
     }
 
     .upload-filename {
       display: none;
-      font-size: 0.95rem;
+      font-size: 1rem;
       color: var(--success);
       font-weight: 600;
-      word-wrap: break-word; /* Allows long filenames to break safely */
+      word-break: break-all;
       margin-top: 12px;
       text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
-      text-align: center;
     }
 
     .upload-pages {
@@ -383,7 +371,7 @@
     }
 
     .command-title {
-      font-size: clamp(1.2rem, 3vw, 1.5rem);
+      font-size: 1.5rem;
       font-weight: 700;
       letter-spacing: 0.05em;
     }
@@ -395,13 +383,12 @@
 
     textarea#command {
       width: 100%;
-      max-width: 100%;
       background: rgba(0, 0, 0, 0.4);
       border: 1px solid rgba(255, 255, 255, 0.1);
       border-radius: 12px;
       color: var(--accent-secondary);
       font-family: 'DM Mono', monospace;
-      font-size: clamp(0.95rem, 2vw, 1.1rem);
+      font-size: 1.1rem;
       padding: 20px;
       resize: vertical;
       min-height: 100px;
@@ -456,7 +443,7 @@
       background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
       color: white;
       border: none;
-      font-size: clamp(1rem, 2vw, 1.2rem);
+      font-size: 1.2rem;
       padding: 20px;
       box-shadow: 0 10px 30px rgba(112, 0, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
       text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
@@ -505,7 +492,9 @@
     }
 
     @keyframes spin {
-      to { transform: rotate(360deg); }
+      to {
+        transform: rotate(360deg);
+      }
     }
 
     /* ── Status / Result ── */
@@ -546,8 +535,15 @@
     }
 
     @keyframes popIn {
-      from { opacity: 0; transform: scale(0.95) translateY(20px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
+      from {
+        opacity: 0;
+        transform: scale(0.95) translateY(20px);
+      }
+
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+      }
     }
 
     .result-header {
@@ -560,7 +556,7 @@
     }
 
     .result-title {
-      font-size: clamp(1.5rem, 4vw, 2rem);
+      font-size: 2rem;
       font-weight: 700;
       color: var(--success);
       display: flex;
@@ -600,7 +596,6 @@
     .btn-download {
       display: inline-flex;
       align-items: center;
-      justify-content: center;
       gap: 10px;
       padding: 14px 32px;
       background: var(--success);
@@ -638,14 +633,10 @@
     }
 
     .table-container {
-      width: 100%;
-      max-width: 100%;
       overflow-x: auto;
-      -webkit-overflow-scrolling: touch; /* smooth scrolling on iOS */
       border-radius: 12px;
       border: 1px solid rgba(255, 255, 255, 0.05);
       transform: translateZ(10px);
-      display: block; /* crucial for allowing internal scroll */
     }
 
     table {
@@ -700,7 +691,7 @@
       position: relative;
       z-index: 10;
       text-align: center;
-      padding: 30px 5%;
+      padding: 30px;
       font-size: 0.8rem;
       color: var(--text-muted);
       border-top: 1px solid rgba(255, 255, 255, 0.05);
@@ -710,95 +701,85 @@
     }
 
     /* ── RESPONSIVE MEDIA QUERIES ── */
-
-    /* Tablet and Small Laptops */
     @media (max-width: 900px) {
-      /* Change from Grid to Flex to prevent content blowout */
-      main { 
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        max-width: 100%;
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .command-card,
+      .result-card,
+      .ref-card {
+        grid-column: 1;
       }
     }
 
-    /* Mobile Phones */
     @media (max-width: 600px) {
-      header { 
-        flex-direction: column; 
+      header {
+        padding: 20px 15px 0;
+        flex-direction: column;
+        gap: 15px;
         text-align: center;
-        gap: 12px;
-        padding-top: 30px;
       }
 
-      .logo { 
-        flex-direction: column; 
-        align-items: center; 
+      .logo {
+        flex-direction: column;
+        align-items: center;
         gap: 4px;
       }
-      
-      .hero { 
-        padding: 40px 5% 20px; 
+
+      .logo-title {
+        font-size: 2rem;
       }
 
-      main { 
-        gap: 20px; 
-      }
-
-      .card { 
-        padding: 24px 20px; 
-      }
-
-      .upload-zone {
+      .hero {
         padding: 30px 15px;
       }
 
-      .command-header {
-        flex-direction: column;
-        align-items: flex-start;
+      .hero p {
+        font-size: 1rem;
       }
 
-      .presets {
-        justify-content: center;
+      main {
+        padding: 0 15px 40px;
+        gap: 20px;
       }
 
-      .result-header {
-        flex-direction: column;
-        align-items: stretch;
-        text-align: center;
+      .card {
+        padding: 20px;
+      }
+
+      .command-title {
+        font-size: 1.25rem;
+      }
+
+      .btn-merge {
+        font-size: 1rem;
+        padding: 16px;
       }
 
       .result-title {
+        font-size: 1.5rem;
+      }
+
+      .result-meta {
+        flex-direction: column;
+        gap: 16px;
+      }
+
+      .btn-download {
+        width: 100%;
         justify-content: center;
-        margin-bottom: 10px;
       }
 
-      .result-meta { 
-        flex-direction: column; 
-        gap: 16px; 
-        align-items: center;
+      tbody td {
+        padding: 12px 10px;
       }
-      
-      .btn-download { 
-        width: 100%; 
-      }
-      
-      tbody td { 
-        padding: 12px 10px; 
-      }
-      
-      /* Hide heavy animations on tiny screens for better performance */
-      .bg-shape { 
-        display: none; 
-      } 
-    }
 
-    /* Extra Small Phones (e.g. iPhone SE) */
-    @media (max-width: 400px) {
-      .card { padding: 20px 15px; }
-      .upload-icon { font-size: 2.5rem; }
-      textarea#command { padding: 15px; }
-      .btn-merge { padding: 16px; }
+      .bg-shape {
+        display: none;
+      }
+
+      /* Better performance on mobile */
     }
   </style>
 </head>
@@ -817,153 +798,76 @@
   </header>
 
   <div class="hero">
-    <h1>Merge PDFs <span>YOUR WAY</span><br />with commands</h1>
-    <p>Upload two PDF files and type a merge command — choose page ranges, interleave, reverse, or create any custom combination in a seamless workspace.</p>
+    <div class="hero-eyebrow">All-in-One PDF Toolkit</div>
+    <h1>Work smarter<br />with <span>PDF Tools</span></h1>
+    <p>Four powerful tools — merge, split, extract, and convert. No uploads to third-party servers. Everything runs
+      locally.</p>
   </div>
 
-  <main>
+  <div class="tools-grid">
 
-    <div class="card" id="card1">
-      <div class="card-label">Document One</div>
-      <div class="upload-zone" id="zone1" ondragover="dragover(event,'zone1')" ondragleave="dragleave('zone1')"
-        ondrop="dropit(event,'pdf1-input','zone1')">
-        <input type="file" id="pdf1-input" accept=".pdf" onchange="fileChosen('pdf1-input','zone1','fn1','fp1')" />
-        <span class="pdf-badge">PDF</span>
-        <span class="upload-icon">📄</span>
-        <div class="upload-text">Drag & drop your file here or click to browse</div>
-        <div class="upload-filename" id="fn1"></div>
-        <div class="upload-pages" id="fp1"></div>
+    <a href="/merger" class="tool-card purple">
+      <div class="tool-icon">🔀</div>
+      <div class="tool-name">PDF Merger</div>
+      <div class="tool-desc">
+        Combine two PDFs with full control — interleave pages, reverse order, specify custom page ranges, and more using
+        simple text commands.
       </div>
+      <div class="tool-tags">
+        <span class="tool-tag">Two PDFs</span>
+        <span class="tool-tag">Commands</span>
+        <span class="tool-tag">Page Ranges</span>
+      </div>
+  </div>
+
+  <div style="grid-column: 1 / -1;">
+    <button class="btn-upload" id="upload-btn" onclick="uploadFiles()" disabled style="margin-top: 0;">
+      Analyse Documents
+    </button>
+    <div class="status" id="upload-status"></div>
+  </div>
+
+  <div class="card command-card" id="command-card">
+    <div class="command-header">
+      <div class="command-title">Merge Command Terminal</div>
+      <div class="command-hint">Type a command or pick a preset below</div>
     </div>
-
-    <div class="card" id="card2">
-      <div class="card-label">Document Two</div>
-      <div class="upload-zone" id="zone2" ondragover="dragover(event,'zone2')" ondragleave="dragleave('zone2')"
-        ondrop="dropit(event,'pdf2-input','zone2')">
-        <input type="file" id="pdf2-input" accept=".pdf" onchange="fileChosen('pdf2-input','zone2','fn2','fp2')" />
-        <span class="pdf-badge">PDF</span>
-        <span class="upload-icon">📄</span>
-        <div class="upload-text">Drag & drop your file here or click to browse</div>
-        <div class="upload-filename" id="fn2"></div>
-        <div class="upload-pages" id="fp2"></div>
-      </div>
+    <div class="tool-tags">
+      <span class="tool-tag">Single PDF</span>
+      <span class="tool-tag">Ranges</span>
+      <span class="tool-tag">ZIP Output</span>
     </div>
+    <div class="tool-launch">Open Tool &rarr;</div>
+    </a>
 
-    <div style="width: 100%;">
-      <button class="btn-upload" id="upload-btn" onclick="uploadFiles()" disabled style="margin-top: 0;">
-        Analyse Documents
-      </button>
-      <div class="status" id="upload-status"></div>
-    </div>
-
-    <div class="card command-card" id="command-card">
-      <div class="command-header">
-        <div class="command-title">Merge Command Terminal</div>
-        <div class="command-hint">Type a command or pick a preset below</div>
+    <a href="/extractor" class="tool-card green">
+      <div class="tool-icon">📑</div>
+      <div class="tool-name">Page Extractor</div>
+      <div class="tool-desc">
+        Pull out specific pages from any PDF into a clean new file. Mix single pages, ranges, and the "end" shortcut —
+        all in one command.
       </div>
-
-      <textarea id="command" rows="2" placeholder="e.g. pdf1:1-3, pdf2:1-2, pdf1:4-end" spellcheck="false"></textarea>
-
-      <div class="presets">
-        <button class="preset-btn" onclick="setCmd('pdf1 pdf2')">PDF1 → PDF2</button>
-        <button class="preset-btn" onclick="setCmd('pdf2 pdf1')">PDF2 → PDF1</button>
-        <button class="preset-btn" onclick="setCmd('interleave')">⇄ Interleave Pages</button>
-        <button class="preset-btn" onclick="setCmd('reverse')">↩ Reverse All</button>
-        <button class="preset-btn" onclick="setCmd('pdf1:1-3, pdf2:1-2')">Custom Range</button>
-        <button class="preset-btn" onclick="setCmd('odd from pdf1, even from pdf2')">Odd/Even Split</button>
-        <button class="preset-btn" onclick="setCmd('only pdf1')">Only PDF1</button>
-        <button class="preset-btn" onclick="setCmd('only pdf2')">Only PDF2</button>
+      <div class="tool-tags">
+        <span class="tool-tag">Single PDF</span>
+        <span class="tool-tag">Page Ranges</span>
+        <span class="tool-tag">New PDF</span>
       </div>
+      <div class="tool-launch">Open Tool &rarr;</div>
+    </a>
 
-      <button class="btn-merge" id="merge-btn" onclick="doMerge()" disabled>
-        EXECUTE MERGE
-        <div class="spinner" id="spinner"></div>
-      </button>
-      <div class="status" id="merge-status"></div>
-    </div>
-
-    <div class="card result-card" id="result-card">
-      <div class="result-header">
-        <div class="result-title">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-            stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          Merge Complete
-        </div>
-        <a class="btn-download" id="download-link" href="#" download>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-          Download PDF
-        </a>
+    <a href="/converter" class="tool-card amber">
+      <div class="tool-icon">🔄</div>
+      <div class="tool-name">File Converter</div>
+      <div class="tool-desc">
+        Convert images (JPG, PNG, WebP…) into PDF — merge multiple images into one document. PPTX and DOCX conversion
+        available when LibreOffice is installed.
       </div>
-      <div class="result-meta">
-        <div class="meta-item">
-          <div class="meta-key">Total Pages</div>
-          <div class="meta-val" id="r-pages">—</div>
-        </div>
-        <div class="meta-item">
-          <div class="meta-key">Command Used</div>
-          <div class="meta-val" id="r-cmd">—</div>
-        </div>
+      <div class="tool-tags">
+        <span class="tool-tag">JPG/PNG</span>
+        <span class="tool-tag">PPTX</span>
+        <span class="tool-tag">DOCX</span>
       </div>
-    </div>
-
-    <div class="card ref-card">
-      <div class="ref-title">Syntax Reference</div>
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Command</th>
-              <th>What it does</th>
-              <th>Example</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>pdf1 pdf2</td>
-              <td>All PDF1 pages, then all PDF2 pages (default)</td>
-              <td>pdf1 pdf2</td>
-            </tr>
-            <tr>
-              <td>pdf2 pdf1</td>
-              <td>All PDF2 pages first, then PDF1</td>
-              <td>pdf2 pdf1</td>
-            </tr>
-            <tr>
-              <td>interleave</td>
-              <td>Alternate pages: P1-pg1, P2-pg1, P1-pg2, P2-pg2 …</td>
-              <td>interleave</td>
-            </tr>
-            <tr>
-              <td>reverse</td>
-              <td>Merge both PDFs, then reverse all page order</td>
-              <td>reverse</td>
-            </tr>
-            <tr>
-              <td>pdf1:X-Y, pdf2:A-B</td>
-              <td>Custom page ranges from each PDF. Use 'end' for last page.</td>
-              <td>pdf1:1-3, pdf2:2-end</td>
-            </tr>
-            <tr>
-              <td>odd from pdf1, even from pdf2</td>
-              <td>Odd-numbered pages from PDF1, even-numbered from PDF2</td>
-              <td>odd from pdf1, even from pdf2</td>
-            </tr>
-            <tr>
-              <td>only pdf1</td>
-              <td>Output only PDF1 (useful for extraction)</td>
-              <td>only pdf1</td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-    </div>
+  </div>
 
   </main>
 

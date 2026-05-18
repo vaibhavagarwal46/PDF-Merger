@@ -1,0 +1,224 @@
+{% extends "base.html" %}
+{% block title %}PDF Splitter — PDF Tools Your smart editor{% endblock %}
+
+{% block nav_right %}
+  <a href="/" class="nav-back">← All Tools</a>
+{% endblock %}
+
+{% block extra_css %}
+  .hero {
+    position:relative; z-index:10; padding:40px 5% 28px;
+    text-align:center; display:flex; flex-direction:column; align-items:center;
+  }
+  .hero h1 { font-size:clamp(2rem,5vw,4rem); font-weight:800; line-height:1.1; margin-bottom:16px; }
+  .hero h1 span { background:linear-gradient(to right,var(--cyan),#00aaff); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .hero p { color:var(--muted); font-size:clamp(.9rem,2vw,1rem); max-width:560px; line-height:1.6; }
+  .cmd-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+  .cmd-title  { font-size:clamp(1.1rem,3vw,1.4rem); font-weight:700; }
+  .cmd-hint   { font-size:.82rem; color:var(--muted); }
+  @media (max-width:600px) {
+    .cmd-header { flex-direction:column; align-items:flex-start; }
+    .presets    { justify-content:center; }
+  }
+{% endblock %}
+
+{% block content %}
+  <div class="hero">
+    <h1>Split PDFs <span>PRECISELY</span><br/>your way</h1>
+    <p>Upload a PDF and tell it how to split — individual pages, fixed chunks, named ranges, or odd/even pages.</p>
+  </div>
+
+  <main>
+
+    <!-- Upload -->
+    <div class="card full-col">
+      <div class="card-label">Upload PDF to Split</div>
+      <div class="upload-zone" id="zone1"
+           ondragover="dragover(event,'zone1')" ondragleave="dragleave('zone1')"
+           ondrop="dropit(event,'pdf-input','zone1', ()=>fileChosen())">
+        <input type="file" id="pdf-input" accept=".pdf" onchange="fileChosen()" />
+        <span class="file-badge pdf-badge">PDF</span>
+        <span class="upload-icon">📄</span>
+        <div class="upload-text">Drag & drop or click to browse</div>
+        <div class="upload-filename" id="fn"></div>
+        <div class="upload-pages" id="fp"></div>
+      </div>
+      <button class="btn btn-secondary" id="upload-btn" onclick="uploadFile()" disabled>
+        Analyse Document
+      </button>
+      <div class="status" id="upload-status"></div>
+    </div>
+
+    <!-- Command Terminal -->
+    <div class="card full-col" id="command-card">
+      <div class="cmd-header">
+        <div class="cmd-title">Split Command Terminal</div>
+        <div class="cmd-hint">Type a command or pick a preset below</div>
+      </div>
+      <textarea id="command" class="cmd-input" rows="2"
+                placeholder="e.g. individual   or   every 3   or   1-4, 5-8, 9-end"
+                spellcheck="false"></textarea>
+      <div class="presets">
+        <button class="preset-btn" onclick="setCmd('individual')">One Page per File</button>
+        <button class="preset-btn" onclick="setCmd('every 2')">Every 2 Pages</button>
+        <button class="preset-btn" onclick="setCmd('every 5')">Every 5 Pages</button>
+        <button class="preset-btn" onclick="setCmd('1-3, 4-6, 7-end')">Named Ranges</button>
+        <button class="preset-btn" onclick="setCmd('odd')">Odd Pages Only</button>
+        <button class="preset-btn" onclick="setCmd('even')">Even Pages Only</button>
+        <button class="preset-btn" onclick="setCmd('1-5')">First 5 Pages</button>
+      </div>
+      <button class="btn btn-primary" id="split-btn" onclick="doSplit()" disabled style="background:linear-gradient(135deg,#0057FF,var(--cyan));">
+        Execute Split
+        <div class="spinner" id="spinner"></div>
+      </button>
+      <div class="status" id="split-status"></div>
+    </div>
+
+    <!-- Result Card -->
+    <div class="card result-card full-col" id="result-card">
+      <div class="result-header">
+        <div class="result-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Split Complete
+        </div>
+        <a class="btn-download" id="download-link" href="#" download>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          <span id="dl-label">Download</span>
+        </a>
+      </div>
+      <div class="result-meta">
+        <div class="meta-item">
+          <div class="meta-key">Parts Created</div>
+          <div class="meta-val" id="r-parts">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-key">Command Used</div>
+          <div class="meta-val" id="r-cmd">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-key">Output File</div>
+          <div class="meta-val" id="r-file">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How to Use -->
+    <div class="card full-col">
+      <div class="ref-title">How to Use — Split Commands</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Command</th><th>What it does</th><th>Output</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>individual</td><td>One PDF per page</td><td>ZIP of N PDFs</td></tr>
+            <tr><td>every N</td><td>Groups of N pages (e.g. every 3)</td><td>ZIP of parts</td></tr>
+            <tr><td>1-5, 6-10, 11-end</td><td>Named ranges, one PDF per range</td><td>ZIP of 3 PDFs</td></tr>
+            <tr><td>1-5</td><td>Single range — extracts those pages</td><td>Single PDF</td></tr>
+            <tr><td>odd</td><td>All odd-numbered pages into one PDF</td><td>Single PDF</td></tr>
+            <tr><td>even</td><td>All even-numbered pages into one PDF</td><td>Single PDF</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:16px; font-size:.82rem; color:var(--muted);">
+        <strong>Tip:</strong> Use <code style="color:var(--cyan)">end</code> to refer to the last page (e.g. <code style="color:var(--cyan)">5-end</code>). Multiple ranges produce a ZIP file; single ranges produce a single PDF.
+      </p>
+    </div>
+
+  </main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  let sessionId = null;
+
+  function fileChosen() {
+    const input = document.getElementById('pdf-input');
+    const zone  = document.getElementById('zone1');
+    const fn    = document.getElementById('fn');
+    const fp    = document.getElementById('fp');
+    if (input.files && input.files[0]) {
+      const f = input.files[0];
+      zone.classList.add('loaded');
+      fn.style.display='block'; fn.textContent='✓ '+f.name;
+      fp.style.display='block'; fp.textContent=(f.size/1024).toFixed(1)+' KB';
+      document.getElementById('upload-btn').disabled = false;
+    }
+  }
+
+  async function uploadFile() {
+    const f = document.getElementById('pdf-input').files[0];
+    if (!f) return;
+
+    const btn = document.getElementById('upload-btn');
+    btn.disabled=true; btn.textContent='Analysing…';
+    showStatus('upload-status','','');
+
+    const fd = new FormData();
+    fd.append('pdf', f);
+
+    try {
+      const res  = await fetch('/splitter/upload', {method:'POST', body:fd});
+      const data = await res.json();
+      if (data.error) {
+        showStatus('upload-status','error','✗ '+data.error);
+        btn.disabled=false; btn.textContent='Analyse Document'; return;
+      }
+      sessionId = data.session_id;
+      document.getElementById('fp').textContent = data.pages+' pages · '+(f.size/1024).toFixed(1)+' KB';
+      showStatus('upload-status','success',`✓ Ready — ${data.pages} pages loaded`);
+      btn.textContent='✓ Analysed';
+      document.getElementById('split-btn').disabled=false;
+    } catch(err) {
+      showStatus('upload-status','error','✗ Network error: '+err.message);
+      btn.disabled=false; btn.textContent='Analyse Document';
+    }
+  }
+
+  async function doSplit() {
+    if (!sessionId) return;
+    const command = document.getElementById('command').value.trim() || 'individual';
+    const btn     = document.getElementById('split-btn');
+    const spinner = document.getElementById('spinner');
+
+    btn.disabled=true; spinner.style.display='block';
+    showStatus('split-status','','');
+    document.getElementById('result-card').style.display='none';
+
+    try {
+      const res  = await fetch('/splitter/split', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({session_id:sessionId, command})
+      });
+      const data = await res.json();
+      if (data.error) {
+        showStatus('split-status','error','✗ '+data.error);
+      } else {
+        const rc = document.getElementById('result-card');
+        rc.style.display='block';
+        document.getElementById('r-parts').textContent = data.total_parts + (data.total_parts===1 ? ' part' : ' parts');
+        document.getElementById('r-cmd').textContent   = command;
+        document.getElementById('r-file').textContent  = data.filename;
+        const dl = document.getElementById('download-link');
+        dl.href = data.download_url;
+        dl.setAttribute('download', data.filename);
+        document.getElementById('dl-label').textContent = data.total_parts===1 ? 'Download PDF' : 'Download ZIP';
+        showStatus('split-status','success','✓ Split complete! '+data.total_parts+' part(s) created.');
+        rc.scrollIntoView({behavior:'smooth', block:'center'});
+      }
+    } catch(err) {
+      showStatus('split-status','error','✗ Network error: '+err.message);
+    } finally {
+      btn.disabled=false; spinner.style.display='none';
+    }
+  }
+
+  function setCmd(v) { document.getElementById('command').value = v; }
+
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey||e.metaKey) && e.key==='Enter') {
+      if (!document.getElementById('split-btn').disabled) doSplit();
+    }
+  });
+</script>
+{% endblock %}
