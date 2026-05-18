@@ -1,5 +1,5 @@
 {% extends "base.html" %}
-{% block title %}File Converter — PDF Tools Your smart editor{% endblock %}
+{% block title %}File Converter — PDF Tools Suite{% endblock %}
 
 {% block nav_right %}
   <a href="/" class="nav-back">← All Tools</a>
@@ -74,8 +74,8 @@
     <div class="card full-col">
       <div class="card-label">Choose File Type</div>
       <div class="format-tabs">
-        <button class="fmt-tab active" onclick="switchTab('images')">Images (JPG/PNG/…)</button>
-        <button class="fmt-tab"        onclick="switchTab('docs')"> Word / PowerPoint</button>
+        <button class="fmt-tab active" onclick="switchTab('images')">🖼️ Images (JPG/PNG/…)</button>
+        <button class="fmt-tab"        onclick="switchTab('docs')">📝 Word / PowerPoint</button>
       </div>
 
       <!-- Images Panel -->
@@ -116,7 +116,7 @@
           <div class="upload-pages" id="doc-fp"></div>
         </div>
         <div class="notice">
-          <strong>LibreOffice Required:</strong> DOCX/PPTX conversion requires LibreOffice to be installed on the server.
+          ⚠️ <strong>LibreOffice Required:</strong> DOCX/PPTX conversion requires LibreOffice to be installed on the server.
           <code style="display:block;margin-top:6px;color:#fbbf24;">sudo apt install libreoffice</code>
         </div>
         <button class="btn btn-primary" id="doc-btn" onclick="doConvertDoc()" disabled
@@ -155,7 +155,7 @@
 
     <!-- How to Use -->
     <div class="card full-col">
-      <div class="ref-title">How to Use — Supported Formats</div>
+      <div class="ref-title">📖 How to Use — Supported Formats</div>
       <div class="table-wrap">
         <table>
           <thead>
@@ -169,7 +169,7 @@
         </table>
       </div>
       <p style="margin-top:16px; font-size:.82rem; color:var(--muted);">
-        <strong>Tip:</strong> Upload multiple images at once. They will be combined into a single multi-page PDF in the order they are listed. Drag to reorder is not yet supported — order your files before selecting.
+        💡 <strong>Image tip:</strong> Upload multiple images at once. They will be combined into a single multi-page PDF in the order they are listed. Drag to reorder is not yet supported — order your files before selecting.
       </p>
     </div>
 
