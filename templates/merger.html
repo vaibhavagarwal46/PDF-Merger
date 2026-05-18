@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block title %}PDF Merger — PDF Tools Your smart editor{% endblock %}
+
+{% block nav_right %}
+  <a href="/" class="nav-back">← All Tools</a>
+{% endblock %}
+
+{% block extra_css %}
+  .hero {
+    position:relative; z-index:10; padding:40px 5% 28px;
+    text-align:center; display:flex; flex-direction:column; align-items:center;
+  }
+  .hero h1 { font-size:clamp(2rem,5vw,4rem); font-weight:800; line-height:1.1; margin-bottom:16px; }
+  .hero h1 span { background:linear-gradient(to right,var(--accent),var(--cyan)); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .hero p { color:var(--muted); font-size:clamp(.9rem,2vw,1rem); max-width:560px; line-height:1.6; }
+
+  .cmd-header { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:20px; }
+  .cmd-title  { font-size:clamp(1.1rem,3vw,1.4rem); font-weight:700; }
+  .cmd-hint   { font-size:.82rem; color:var(--muted); }
+
+  @media (max-width:600px) {
+    .cmd-header { flex-direction:column; align-items:flex-start; }
+    .presets    { justify-content:center; }
+  }
+{% endblock %}
+
+{% block content %}
+  <div class="hero">
+    <h1>Merge PDFs <span>YOUR WAY</span><br/>with commands</h1>
+    <p>Upload two PDF files and type a merge command — choose page ranges, interleave, reverse, or create any custom combination.</p>
+  </div>
+
+  <main>
+
+    <!-- PDF 1 -->
+    <div class="card">
+      <div class="card-label">Document One</div>
+      <div class="upload-zone" id="zone1"
+           ondragover="dragover(event,'zone1')" ondragleave="dragleave('zone1')"
+           ondrop="dropit(event,'pdf1-input','zone1', ()=>fileChosen('pdf1-input','zone1','fn1','fp1'))">
+        <input type="file" id="pdf1-input" accept=".pdf"
+               onchange="fileChosen('pdf1-input','zone1','fn1','fp1')" />
+        <span class="file-badge pdf-badge">PDF</span>
+        <span class="upload-icon">📄</span>
+        <div class="upload-text">Drag & drop or click to browse</div>
+        <div class="upload-filename" id="fn1"></div>
+        <div class="upload-pages" id="fp1"></div>
+      </div>
+    </div>
+
+    <!-- PDF 2 -->
+    <div class="card">
+      <div class="card-label">Document Two</div>
+      <div class="upload-zone" id="zone2"
+           ondragover="dragover(event,'zone2')" ondragleave="dragleave('zone2')"
+           ondrop="dropit(event,'pdf2-input','zone2', ()=>fileChosen('pdf2-input','zone2','fn2','fp2'))">
+        <input type="file" id="pdf2-input" accept=".pdf"
+               onchange="fileChosen('pdf2-input','zone2','fn2','fp2')" />
+        <span class="file-badge pdf-badge">PDF</span>
+        <span class="upload-icon">📄</span>
+        <div class="upload-text">Drag & drop or click to browse</div>
+        <div class="upload-filename" id="fn2"></div>
+        <div class="upload-pages" id="fp2"></div>
+      </div>
+    </div>
+
+    <!-- Analyse Button -->
+    <div class="full-col">
+      <button class="btn btn-secondary" id="upload-btn" onclick="uploadFiles()" disabled>
+        Analyse Documents
+      </button>
+      <div class="status" id="upload-status"></div>
+    </div>
+
+    <!-- Command Terminal -->
+    <div class="card full-col" id="command-card">
+      <div class="cmd-header">
+        <div class="cmd-title">Merge Command Terminal</div>
+        <div class="cmd-hint">Type a command or pick a preset below</div>
+      </div>
+      <textarea id="command" class="cmd-input" rows="2"
+                placeholder="e.g. pdf1:1-3, pdf2:1-2, pdf1:4-end" spellcheck="false"></textarea>
+      <div class="presets">
+        <button class="preset-btn" onclick="setCmd('pdf1 pdf2')">PDF1 → PDF2</button>
+        <button class="preset-btn" onclick="setCmd('pdf2 pdf1')">PDF2 → PDF1</button>
+        <button class="preset-btn" onclick="setCmd('interleave')">⇄ Interleave</button>
+        <button class="preset-btn" onclick="setCmd('reverse')">↩ Reverse All</button>
+        <button class="preset-btn" onclick="setCmd('pdf1:1-3, pdf2:1-2')">Custom Range</button>
+        <button class="preset-btn" onclick="setCmd('odd from pdf1, even from pdf2')">Odd/Even Split</button>
+        <button class="preset-btn" onclick="setCmd('only pdf1')">Only PDF1</button>
+        <button class="preset-btn" onclick="setCmd('only pdf2')">Only PDF2</button>
+      </div>
+      <button class="btn btn-primary" id="merge-btn" onclick="doMerge()" disabled>
+        Execute Merge
+        <div class="spinner" id="spinner"></div>
+      </button>
+      <div class="status" id="merge-status"></div>
+    </div>
+
+    <!-- Result Card -->
+    <div class="card result-card full-col" id="result-card">
+      <div class="result-header">
+        <div class="result-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Merge Complete
+        </div>
+        <a class="btn-download" id="download-link" href="#" download>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PDF
+        </a>
+      </div>
+      <div class="result-meta">
+        <div class="meta-item">
+          <div class="meta-key">Total Pages</div>
+          <div class="meta-val" id="r-pages">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-key">Command Used</div>
+          <div class="meta-val" id="r-cmd">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How to Use -->
+    <div class="card full-col">
+      <div class="ref-title">How to Use — Command Syntax</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Command</th><th>What it does</th><th>Example</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>pdf1 pdf2</td><td>All PDF1 pages, then all PDF2 (default)</td><td>pdf1 pdf2</td></tr>
+            <tr><td>pdf2 pdf1</td><td>PDF2 first, then PDF1</td><td>pdf2 pdf1</td></tr>
+            <tr><td>interleave</td><td>Alternate pages: P1pg1, P2pg1, P1pg2, P2pg2…</td><td>interleave</td></tr>
+            <tr><td>reverse</td><td>Merge both PDFs then reverse all page order</td><td>reverse</td></tr>
+            <tr><td>pdf1:X-Y, pdf2:A-B</td><td>Custom ranges from each PDF. Use "end" for last page.</td><td>pdf1:1-3, pdf2:2-end</td></tr>
+            <tr><td>odd from pdf1, even from pdf2</td><td>Odd pages from PDF1, even pages from PDF2</td><td>odd from pdf1, even from pdf2</td></tr>
+            <tr><td>only pdf1</td><td>Output only PDF1 (extraction)</td><td>only pdf1</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  let sessionId = null;
+
+  function fileChosen(inputId, zoneId, fnId, fpId) {
+    const input = document.getElementById(inputId);
+    const zone  = document.getElementById(zoneId);
+    const fn    = document.getElementById(fnId);
+    const fp    = document.getElementById(fpId);
+    if (input.files && input.files[0]) {
+      const f = input.files[0];
+      zone.classList.add('loaded');
+      fn.style.display = 'block'; fn.textContent = '✓ ' + f.name;
+      fp.style.display = 'block'; fp.textContent = (f.size/1024).toFixed(1) + ' KB';
+      checkBothLoaded();
+    }
+  }
+
+  function checkBothLoaded() {
+    const f1 = document.getElementById('pdf1-input').files[0];
+    const f2 = document.getElementById('pdf2-input').files[0];
+    document.getElementById('upload-btn').disabled = !(f1 && f2);
+  }
+
+  async function uploadFiles() {
+    const f1 = document.getElementById('pdf1-input').files[0];
+    const f2 = document.getElementById('pdf2-input').files[0];
+    if (!f1 || !f2) return;
+
+    const btn = document.getElementById('upload-btn');
+    btn.disabled = true; btn.textContent = 'Analysing…';
+    showStatus('upload-status','','');
+
+    const fd = new FormData();
+    fd.append('pdf1', f1); fd.append('pdf2', f2);
+
+    try {
+      const res  = await fetch('/merger/upload', {method:'POST', body:fd});
+      const data = await res.json();
+      if (data.error) {
+        showStatus('upload-status','error','✗ '+data.error);
+        btn.disabled=false; btn.textContent='Analyse Documents'; return;
+      }
+      sessionId = data.session_id;
+      document.getElementById('fp1').textContent = data.pdf1.pages+' pages · '+(f1.size/1024).toFixed(1)+' KB';
+      document.getElementById('fp2').textContent = data.pdf2.pages+' pages · '+(f2.size/1024).toFixed(1)+' KB';
+      showStatus('upload-status','success',`✓ Ready — Doc 1: ${data.pdf1.pages} pgs | Doc 2: ${data.pdf2.pages} pgs`);
+      btn.textContent = '✓ Documents Analysed';
+      document.getElementById('merge-btn').disabled = false;
+    } catch(err) {
+      showStatus('upload-status','error','✗ Network error: '+err.message);
+      btn.disabled=false; btn.textContent='Analyse Documents';
+    }
+  }
+
+  async function doMerge() {
+    if (!sessionId) return;
+    const command = document.getElementById('command').value.trim() || 'pdf1 pdf2';
+    const btn     = document.getElementById('merge-btn');
+    const spinner = document.getElementById('spinner');
+
+    btn.disabled=true; spinner.style.display='block';
+    showStatus('merge-status','','');
+    document.getElementById('result-card').style.display='none';
+
+    try {
+      const res  = await fetch('/merger/merge', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({session_id:sessionId, command})
+      });
+      const data = await res.json();
+      if (data.error) {
+        showStatus('merge-status','error','✗ '+data.error);
+      } else {
+        const rc = document.getElementById('result-card');
+        rc.style.display='block';
+        document.getElementById('r-pages').textContent = data.pages+' pages';
+        document.getElementById('r-cmd').textContent   = command;
+        const dl = document.getElementById('download-link');
+        dl.href = data.download_url; dl.setAttribute('download','merged_output.pdf');
+        showStatus('merge-status','success','✓ Merge successful! '+data.pages+' pages in output.');
+        rc.scrollIntoView({behavior:'smooth', block:'center'});
+      }
+    } catch(err) {
+      showStatus('merge-status','error','✗ Network error: '+err.message);
+    } finally {
+      btn.disabled=false; spinner.style.display='none';
+    }
+  }
+
+  function setCmd(v) { document.getElementById('command').value = v; }
+
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey||e.metaKey) && e.key==='Enter') {
+      if (!document.getElementById('merge-btn').disabled) doMerge();
+    }
+  });
+</script>
+{% endblock %}

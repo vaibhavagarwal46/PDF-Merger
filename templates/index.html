@@ -1,1101 +1,182 @@
-<!DOCTYPE html>
-<html lang="en">
-
-<head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <meta name="description" content="A premium 3D PDF merging tool">
-  <title>PDF Merger — Premium Document Tool</title>
-  <link
-    href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&family=DM+Mono:ital,wght@0,400;0,500;1,400&display=swap"
-    rel="stylesheet" />
-  <style>
-    /* ── CSS Variables ── */
-    :root {
-      --bg-dark: #050507;
-      --glass-bg: rgba(255, 255, 255, 0.03);
-      --glass-bg-hover: rgba(255, 255, 255, 0.06);
-      --glass-border: rgba(255, 255, 255, 0.05);
-      --glass-highlight: rgba(255, 255, 255, 0.1);
-
-      --accent-primary: #7000FF;
-      --accent-secondary: #00D0FF;
-      --text-main: #F3F4F6;
-      --text-muted: #9CA3AF;
-      --success: #10B981;
-      --error: #EF4444;
-      --card-radius: 20px;
-    }
-
-    *,
-    *::before,
-    *::after {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
-
-    body {
-      background-color: var(--bg-dark);
-      background-image:
-        radial-gradient(circle at 15% 50%, rgba(112, 0, 255, 0.15), transparent 25%),
-        radial-gradient(circle at 85% 30%, rgba(0, 208, 255, 0.15), transparent 25%);
-      color: var(--text-main);
-      font-family: 'Outfit', sans-serif;
-      min-height: 100vh;
-      overflow-x: hidden;
-      perspective: 1000px;
-    }
-
-    /* Animated background elements */
-    .bg-shape {
-      position: fixed;
-      filter: blur(100px);
-      z-index: -1;
-      animation: float 20s infinite ease-in-out;
-      border-radius: 50%;
-    }
-
-    .shape-1 {
-      width: 400px;
-      height: 400px;
-      background: var(--accent-primary);
-      top: -10%;
-      left: -10%;
-      opacity: 0.3;
-    }
-
-    .shape-2 {
-      width: 500px;
-      height: 500px;
-      background: var(--accent-secondary);
-      bottom: -20%;
-      right: -10%;
-      opacity: 0.2;
-      animation-delay: -5s;
-    }
-
-    @keyframes float {
-      0%, 100% { transform: translateY(0) scale(1); }
-      50% { transform: translateY(-30px) scale(1.05); }
-    }
-
-    /* ── Header ── */
-    header {
-      padding: 40px 60px 0;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      position: relative;
-      z-index: 10;
-    }
-
-    .logo {
-      display: flex;
-      align-items: baseline;
-      gap: 12px;
-    }
-
-    .logo-title {
-      font-size: 2.5rem;
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      background: linear-gradient(135deg, #fff 0%, #a5a5a5 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      text-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
-    }
-
-    .logo-sub {
-      font-size: 0.9rem;
-      color: var(--text-secondary);
-      background: linear-gradient(135deg, var(--accent-primary) 0%, var(--accent-secondary) 100%);
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-    }
-
-    .header-tag {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
-      padding: 8px 16px;
-      border-radius: 99px;
-      letter-spacing: 0.05em;
-      backdrop-filter: blur(10px);
-      box-shadow: inset 0 1px 1px rgba(255, 255, 255, 0.1), 0 4px 15px rgba(0, 0, 0, 0.2);
-      white-space: nowrap;
-    }
-
-    /* ── Hero ── */
-    .hero {
-      position: relative;
-      z-index: 10;
-      padding: 60px 60px 40px;
-      text-align: center;
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-    }
-
-    .hero h1 {
-      font-size: clamp(2.2rem, 6vw, 5rem);
-      line-height: 1.1;
-      font-weight: 700;
-      max-width: 900px;
-      margin-bottom: 24px;
-      text-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-    }
-
-    .hero h1 span {
-      background: linear-gradient(to right, var(--accent-primary), var(--accent-secondary));
-      -webkit-background-clip: text;
-      -webkit-text-fill-color: transparent;
-      position: relative;
-      display: inline-block;
-    }
-
-    .hero p {
-      color: var(--text-muted);
-      font-size: 1.1rem;
-      max-width: 600px;
-      line-height: 1.6;
-      font-weight: 300;
-    }
-
-    /* ── Main Layout ── */
-    main {
-      position: relative;
-      z-index: 10;
-      padding: 0 60px 80px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 32px;
-      max-width: 1300px;
-      margin: 0 auto;
-    }
-
-    /* ── 3D Glass Cards ── */
-    .card {
-      background: var(--glass-bg);
-      backdrop-filter: blur(16px);
-      -webkit-backdrop-filter: blur(16px);
-      border: 1px solid var(--glass-border);
-      border-top: 1px solid var(--glass-highlight);
-      border-left: 1px solid var(--glass-highlight);
-      border-radius: var(--card-radius);
-      padding: 40px;
-      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1);
-      transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275), box-shadow 0.4s ease;
-      transform-style: preserve-3d;
-    }
-
-    @media (hover: hover) and (pointer: fine) {
-      .card:hover {
-        transform: translateY(-5px) rotateX(2deg) rotateY(-2deg);
-        box-shadow:
-          0 30px 60px rgba(0, 0, 0, 0.5),
-          -10px 10px 20px rgba(112, 0, 255, 0.1),
-          10px -10px 20px rgba(0, 208, 255, 0.1),
-          inset 0 1px 0 rgba(255, 255, 255, 0.2);
-      }
-    }
-
-    .card-label {
-      font-size: 0.8rem;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--text-main);
-      font-weight: 600;
-      margin-bottom: 24px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .card-label::before {
-      content: '';
-      display: inline-block;
-      width: 24px;
-      height: 2px;
-      background: linear-gradient(90deg, var(--accent-primary), var(--accent-secondary));
-      border-radius: 2px;
-    }
-
-    /* ── Upload Zone ── */
-    .upload-zone {
-      border: 2px dashed rgba(255, 255, 255, 0.15);
-      border-radius: 16px;
-      padding: 40px 20px;
-      text-align: center;
-      cursor: pointer;
-      transition: all 0.3s ease;
-      position: relative;
-      background: rgba(0, 0, 0, 0.2);
-      transform: translateZ(20px);
-    }
-
-    .upload-zone:hover,
-    .upload-zone.dragover {
-      border-color: var(--accent-secondary);
-      background: rgba(0, 208, 255, 0.05);
-      box-shadow: inset 0 0 20px rgba(0, 208, 255, 0.1);
-    }
-
-    .upload-zone.loaded {
-      border-color: var(--success);
-      border-style: solid;
-      background: rgba(16, 185, 129, 0.05);
-      box-shadow: inset 0 0 20px rgba(16, 185, 129, 0.1), 0 0 15px rgba(16, 185, 129, 0.2);
-    }
-
-    .upload-zone input[type="file"] {
-      position: absolute;
-      inset: 0;
-      opacity: 0;
-      cursor: pointer;
-      width: 100%;
-      height: 100%;
-      z-index: 2;
-    }
-
-    .upload-icon {
-      font-size: 3rem;
-      margin-bottom: 16px;
-      display: inline-block;
-      filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.3));
-      transition: transform 0.3s ease;
-    }
-
-    .upload-zone:hover .upload-icon {
-      transform: scale(1.1) translateY(-5px);
-    }
-
-    .upload-text {
-      font-size: 1rem;
-      color: var(--text-muted);
-      font-weight: 400;
-    }
-
-    .upload-filename {
-      display: none;
-      font-size: 1rem;
-      color: var(--success);
-      font-weight: 600;
-      word-break: break-all;
-      margin-top: 12px;
-      text-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
-    }
-
-    .upload-pages {
-      display: none;
-      font-size: 0.85rem;
-      color: var(--text-muted);
-      margin-top: 6px;
-    }
-
-    .pdf-badge {
-      display: inline-block;
-      background: linear-gradient(135deg, #FF4B4B, #E61E1E);
-      color: white;
-      font-size: 0.7rem;
-      font-weight: 700;
-      letter-spacing: 0.1em;
-      padding: 4px 10px;
-      border-radius: 6px;
-      margin-bottom: 16px;
-      box-shadow: 0 4px 10px rgba(230, 30, 30, 0.3);
-    }
-
-    /* ── Buttons ── */
-    .btn-upload,
-    .btn-merge {
-      width: 100%;
-      padding: 16px;
-      font-family: 'Outfit', sans-serif;
-      font-size: 1rem;
-      font-weight: 600;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      border-radius: 12px;
-      cursor: pointer;
-      transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-      position: relative;
-      overflow: hidden;
-      transform: translateZ(10px);
-    }
-
-    .btn-upload {
-      margin-top: 32px;
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--text-main);
-      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-    }
-
-    .btn-upload:hover:not(:disabled) {
-      background: rgba(255, 255, 255, 0.1);
-      border-color: var(--accent-secondary);
-      box-shadow: 0 8px 25px rgba(0, 208, 255, 0.2);
-      transform: translateZ(15px) translateY(-2px);
-    }
-
-    .btn-upload:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
-
-    /* ── Command Box ── */
-    .command-card {
-      grid-column: 1 / -1;
-    }
-
-    .command-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-bottom: 24px;
-      transform: translateZ(10px);
-    }
-
-    .command-title {
-      font-size: 1.5rem;
-      font-weight: 700;
-      letter-spacing: 0.05em;
-    }
-
-    .command-hint {
-      font-size: 0.85rem;
-      color: var(--text-muted);
-    }
-
-    textarea#command {
-      width: 100%;
-      background: rgba(0, 0, 0, 0.4);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      border-radius: 12px;
-      color: var(--accent-secondary);
-      font-family: 'DM Mono', monospace;
-      font-size: 1.1rem;
-      padding: 20px;
-      resize: vertical;
-      min-height: 100px;
-      outline: none;
-      transition: all 0.3s ease;
-      box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.5);
-      transform: translateZ(15px);
-    }
-
-    textarea#command:focus {
-      border-color: var(--accent-secondary);
-      box-shadow: inset 0 4px 20px rgba(0, 0, 0, 0.5), 0 0 15px rgba(0, 208, 255, 0.2);
-    }
-
-    textarea#command::placeholder {
-      color: rgba(255, 255, 255, 0.2);
-    }
-
-    /* ── Command Presets ── */
-    .presets {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin-top: 20px;
-      transform: translateZ(10px);
-    }
-
-    .preset-btn {
-      background: rgba(255, 255, 255, 0.05);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: var(--text-main);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.8rem;
-      padding: 8px 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s ease;
-      backdrop-filter: blur(5px);
-    }
-
-    .preset-btn:hover {
-      border-color: var(--accent-secondary);
-      background: rgba(0, 208, 255, 0.1);
-      color: var(--accent-secondary);
-      transform: translateY(-2px);
-      box-shadow: 0 4px 12px rgba(0, 208, 255, 0.15);
-    }
-
-    /* ── Merge Button ── */
-    .btn-merge {
-      margin-top: 32px;
-      background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
-      color: white;
-      border: none;
-      font-size: 1.2rem;
-      padding: 20px;
-      box-shadow: 0 10px 30px rgba(112, 0, 255, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.3);
-      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-    }
-
-    .btn-merge::before {
-      content: '';
-      position: absolute;
-      top: 0;
-      left: -100%;
-      width: 50%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-      transform: skewX(-20deg);
-      transition: left 0.5s ease;
-    }
-
-    .btn-merge:hover:not(:disabled) {
-      transform: translateZ(20px) translateY(-3px) scale(1.01);
-      box-shadow: 0 15px 40px rgba(0, 208, 255, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.4);
-    }
-
-    .btn-merge:hover:not(:disabled)::before {
-      left: 150%;
-    }
-
-    .btn-merge:disabled {
-      opacity: 0.3;
-      cursor: not-allowed;
-      transform: none;
-      box-shadow: none;
-    }
-
-    .btn-merge .spinner {
-      display: none;
-      width: 20px;
-      height: 20px;
-      border: 3px solid rgba(255, 255, 255, 0.3);
-      border-top-color: white;
-      border-radius: 50%;
-      animation: spin 0.8s linear infinite;
-      position: absolute;
-      right: 24px;
-      top: 50%;
-      margin-top: -10px;
-    }
-
-    @keyframes spin {
-      to { transform: rotate(360deg); }
-    }
-
-    /* ── Status / Result ── */
-    .status {
-      display: none;
-      margin-top: 24px;
-      padding: 16px 24px;
-      border-radius: 12px;
-      font-size: 0.95rem;
-      line-height: 1.6;
-      transform: translateZ(5px);
-      backdrop-filter: blur(10px);
-    }
-
-    .status.error {
-      display: block;
-      background: rgba(239, 68, 68, 0.1);
-      border: 1px solid rgba(239, 68, 68, 0.3);
-      color: var(--error);
-      box-shadow: 0 4px 15px rgba(239, 68, 68, 0.1);
-    }
-
-    .status.success {
-      display: block;
-      background: rgba(16, 185, 129, 0.1);
-      border: 1px solid rgba(16, 185, 129, 0.3);
-      color: var(--success);
-      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.1);
-    }
-
-    /* ── Result Card ── */
-    .result-card {
-      display: none;
-      grid-column: 1 / -1;
-      border-color: rgba(16, 185, 129, 0.3);
-      background: linear-gradient(145deg, rgba(16, 185, 129, 0.05), rgba(0, 0, 0, 0.4));
-      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-    }
-
-    @keyframes popIn {
-      from { opacity: 0; transform: scale(0.95) translateY(20px); }
-      to { opacity: 1; transform: scale(1) translateY(0); }
-    }
-
-    .result-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      flex-wrap: wrap;
-      gap: 16px;
-      transform: translateZ(10px);
-    }
-
-    .result-title {
-      font-size: 2rem;
-      font-weight: 700;
-      color: var(--success);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      text-shadow: 0 0 20px rgba(16, 185, 129, 0.4);
-    }
-
-    .result-meta {
-      display: flex;
-      gap: 40px;
-      margin-top: 24px;
-      transform: translateZ(10px);
-    }
-
-    .meta-item {
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-    }
-
-    .meta-key {
-      font-size: 0.75rem;
-      color: var(--text-muted);
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      font-weight: 600;
-    }
-
-    .meta-val {
-      font-size: 1.1rem;
-      color: var(--text-main);
-      font-family: 'DM Mono', monospace;
-      word-break: break-all;
-    }
-
-    .btn-download {
-      display: inline-flex;
-      align-items: center;
-      gap: 10px;
-      padding: 14px 32px;
-      background: var(--success);
-      color: #000;
-      font-weight: 700;
-      font-size: 1rem;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      border: none;
-      border-radius: 10px;
-      cursor: pointer;
-      text-decoration: none;
-      transition: all 0.3s ease;
-      box-shadow: 0 10px 20px rgba(16, 185, 129, 0.3), inset 0 2px 0 rgba(255, 255, 255, 0.4);
-      white-space: nowrap;
-    }
-
-    .btn-download:hover {
-      transform: translateY(-3px) scale(1.05);
-      box-shadow: 0 15px 30px rgba(16, 185, 129, 0.4), inset 0 2px 0 rgba(255, 255, 255, 0.4);
-      background: #12d494;
-    }
-
-    /* ── Reference Table ── */
-    .ref-card {
-      grid-column: 1 / -1;
-    }
-
-    .ref-title {
-      font-size: 1.25rem;
-      font-weight: 600;
-      color: var(--text-main);
-      margin-bottom: 20px;
-      transform: translateZ(10px);
-    }
-
-    .table-container {
-      overflow-x: auto;
-      border-radius: 12px;
-      border: 1px solid rgba(255, 255, 255, 0.05);
-      transform: translateZ(10px);
-    }
-
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.9rem;
-      background: rgba(0, 0, 0, 0.2);
-    }
-
-    thead th {
-      text-align: left;
-      padding: 16px 20px;
-      font-size: 0.75rem;
-      letter-spacing: 0.1em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-      background: rgba(255, 255, 255, 0.02);
-      font-weight: 600;
-    }
-
-    tbody tr {
-      border-bottom: 1px solid rgba(255, 255, 255, 0.03);
-      transition: background 0.2s;
-    }
-
-    tbody tr:hover {
-      background: rgba(255, 255, 255, 0.05);
-    }
-
-    tbody td {
-      padding: 16px 20px;
-      vertical-align: middle;
-      line-height: 1.5;
-    }
-
-    tbody td:first-child {
-      font-family: 'DM Mono', monospace;
-      color: var(--accent-secondary);
-      white-space: nowrap;
-      font-weight: 500;
-    }
-
-    tbody td:last-child {
-      color: var(--text-muted);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.85rem;
-    }
-
-    /* ── Footer ── */
-    footer {
-      position: relative;
-      z-index: 10;
-      text-align: center;
-      padding: 30px;
-      font-size: 0.8rem;
-      color: var(--text-muted);
-      border-top: 1px solid rgba(255, 255, 255, 0.05);
-      letter-spacing: 0.1em;
-      background: rgba(0, 0, 0, 0.2);
-      backdrop-filter: blur(10px);
-    }
-
-    /* ── RESPONSIVE MEDIA QUERIES ── */
-    @media (max-width: 900px) {
-      main { grid-template-columns: 1fr; }
-      .command-card, .result-card, .ref-card { grid-column: 1; }
-    }
-
-    @media (max-width: 600px) {
-      header { 
-        padding: 20px 15px 0; 
-        flex-direction: column; 
-        gap: 15px; 
-        text-align: center;
-      }
-      
-      .logo { 
-        flex-direction: column; 
-        align-items: center; 
-        gap: 4px;
-      }
-
-      .logo-title { font-size: 2rem; }
-      
-      .hero { padding: 30px 15px; }
-      .hero p { font-size: 1rem; }
-
-      main { 
-        padding: 0 15px 40px; 
-        gap: 20px; 
-      }
-
-      .card { padding: 20px; }
-
-      .command-title { font-size: 1.25rem; }
-      .btn-merge { font-size: 1rem; padding: 16px; }
-
-      .result-title { font-size: 1.5rem; }
-      .result-meta { 
-        flex-direction: column; 
-        gap: 16px; 
-      }
-      
-      .btn-download { width: 100%; justify-content: center; }
-      
-      tbody td { padding: 12px 10px; }
-      
-      .bg-shape { display: none; } /* Better performance on mobile */
-    }
-  </style>
-</head>
-
-<body>
-
-  <div class="bg-shape shape-1"></div>
-  <div class="bg-shape shape-2"></div>
-
-  <header>
-    <div class="logo">
-      <div class="logo-title">PDF MERGER</div>
-      <div class="logo-sub">Your Smart Document Tool</div>
-    </div>
-    <div class="header-tag">Vaibhav Agarwal</div>
-  </header>
-
+{% extends "base.html" %}
+{% block title %}PDF Tools Your smart editor — Your Smart Document Toolkit{% endblock %}
+
+{% block extra_css %}
+  /* ── Hero ── */
+  .hero {
+    position:relative; z-index:10; padding:50px 5% 36px;
+    text-align:center; display:flex; flex-direction:column; align-items:center; width:100%;
+  }
+  .hero-eyebrow {
+    font-size:.78rem; letter-spacing:.2em; text-transform:uppercase; color:var(--muted);
+    background:var(--glass); border:1px solid var(--glass-border);
+    padding:6px 18px; border-radius:99px; margin-bottom:28px;
+    backdrop-filter:blur(10px);
+  }
+  .hero h1 {
+    font-size:clamp(2.4rem,7vw,5.5rem); line-height:1.05; font-weight:800;
+    max-width:900px; margin-bottom:20px;
+    text-shadow:0 10px 30px rgba(0,0,0,.5);
+  }
+  .hero h1 span {
+    background:linear-gradient(to right,var(--accent),var(--cyan));
+    -webkit-background-clip:text; -webkit-text-fill-color:transparent;
+  }
+  .hero p {
+    color:var(--muted); font-size:clamp(.95rem,2vw,1.1rem);
+    max-width:580px; line-height:1.65; font-weight:300;
+  }
+
+  /* ── Tool Grid ── */
+  .tools-grid {
+    position:relative; z-index:10; padding:0 5% 80px;
+    display:grid; grid-template-columns:repeat(2,1fr); gap:24px;
+    max-width:1100px; margin:0 auto; width:100%;
+  }
+
+  /* ── Tool Card ── */
+  .tool-card {
+    background:var(--glass);
+    backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    border:1px solid var(--glass-border);
+    border-top:1px solid var(--glass-hi); border-left:1px solid var(--glass-hi);
+    border-radius:var(--radius); padding:36px;
+    box-shadow:0 20px 40px rgba(0,0,0,.4), inset 0 1px 0 rgba(255,255,255,.08);
+    cursor:pointer; text-decoration:none; display:flex; flex-direction:column;
+    transition:transform .35s cubic-bezier(.175,.885,.32,1.275), box-shadow .35s ease, border-color .3s ease;
+    position:relative; overflow:hidden;
+  }
+  .tool-card::before {
+    content:''; position:absolute; inset:0; border-radius:var(--radius);
+    opacity:0; transition:opacity .3s ease;
+  }
+  .tool-card.blue::before   { background:radial-gradient(circle at 0% 0%,rgba(0,208,255,.12),transparent 60%); }
+  .tool-card.purple::before { background:radial-gradient(circle at 0% 0%,rgba(112,0,255,.12),transparent 60%); }
+  .tool-card.green::before  { background:radial-gradient(circle at 0% 0%,rgba(16,185,129,.12),transparent 60%); }
+  .tool-card.amber::before  { background:radial-gradient(circle at 0% 0%,rgba(245,158,11,.12),transparent 60%); }
+  .tool-card:hover::before  { opacity:1; }
+
+  @media (hover:hover) and (pointer:fine) {
+    .tool-card:hover {
+      transform:translateY(-6px) scale(1.01);
+      box-shadow:0 32px 64px rgba(0,0,0,.55), inset 0 1px 0 rgba(255,255,255,.15);
+    }
+    .tool-card.blue:hover   { border-color:rgba(0,208,255,.35); }
+    .tool-card.purple:hover { border-color:rgba(112,0,255,.35); }
+    .tool-card.green:hover  { border-color:rgba(16,185,129,.35); }
+    .tool-card.amber:hover  { border-color:rgba(245,158,11,.35); }
+  }
+
+  .tool-icon {
+    width:56px; height:56px; border-radius:16px;
+    display:flex; align-items:center; justify-content:center;
+    font-size:1.6rem; margin-bottom:22px;
+    box-shadow:0 8px 20px rgba(0,0,0,.3);
+  }
+  .tool-card.blue   .tool-icon { background:linear-gradient(135deg,rgba(0,208,255,.25),rgba(0,208,255,.05)); border:1px solid rgba(0,208,255,.3); }
+  .tool-card.purple .tool-icon { background:linear-gradient(135deg,rgba(112,0,255,.25),rgba(112,0,255,.05)); border:1px solid rgba(112,0,255,.3); }
+  .tool-card.green  .tool-icon { background:linear-gradient(135deg,rgba(16,185,129,.25),rgba(16,185,129,.05)); border:1px solid rgba(16,185,129,.3); }
+  .tool-card.amber  .tool-icon { background:linear-gradient(135deg,rgba(245,158,11,.25),rgba(245,158,11,.05)); border:1px solid rgba(245,158,11,.3); }
+
+  .tool-name {
+    font-size:1.25rem; font-weight:700; color:var(--text); margin-bottom:10px;
+  }
+  .tool-desc {
+    font-size:.88rem; color:var(--muted); line-height:1.6; flex:1;
+  }
+  .tool-tags {
+    display:flex; flex-wrap:wrap; gap:6px; margin-top:20px;
+  }
+  .tool-tag {
+    font-size:.7rem; padding:4px 10px; border-radius:6px; font-weight:600;
+    letter-spacing:.05em;
+  }
+  .blue   .tool-tag { background:rgba(0,208,255,.12); color:#00D0FF; border:1px solid rgba(0,208,255,.2); }
+  .purple .tool-tag { background:rgba(112,0,255,.12); color:#a06bff; border:1px solid rgba(112,0,255,.2); }
+  .green  .tool-tag { background:rgba(16,185,129,.12); color:#10B981; border:1px solid rgba(16,185,129,.2); }
+  .amber  .tool-tag { background:rgba(245,158,11,.12); color:#F59E0B; border:1px solid rgba(245,158,11,.2); }
+
+  .tool-launch {
+    display:inline-flex; align-items:center; gap:8px;
+    margin-top:24px; font-size:.82rem; font-weight:700;
+    letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
+    transition:color .2s, gap .2s;
+  }
+  .tool-card:hover .tool-launch { gap:12px; }
+  .blue:hover   .tool-launch { color:var(--cyan); }
+  .purple:hover .tool-launch { color:#a06bff; }
+  .green:hover  .tool-launch { color:var(--success); }
+  .amber:hover  .tool-launch { color:var(--warning); }
+
+  @media (max-width:700px) {
+    .tools-grid { grid-template-columns:1fr; }
+  }
+{% endblock %}
+
+{% block content %}
   <div class="hero">
-    <h1>Merge PDFs <span>YOUR WAY</span><br />with commands</h1>
-    <p>Upload two PDF files and type a merge command — choose page ranges, interleave, reverse, or create any custom combination in a seamless workspace.</p>
+    <div class="hero-eyebrow">All-in-One PDF Toolkit</div>
+    <h1>Work smarter<br/>with <span>PDF Tools</span></h1>
+    <p>Four powerful tools — merge, split, extract, and convert. No uploads to third-party servers. Everything runs locally.</p>
   </div>
 
-  <main>
+  <div class="tools-grid">
 
-    <div class="card" id="card1">
-      <div class="card-label">Document One</div>
-      <div class="upload-zone" id="zone1" ondragover="dragover(event,'zone1')" ondragleave="dragleave('zone1')"
-        ondrop="dropit(event,'pdf1-input','zone1')">
-        <input type="file" id="pdf1-input" accept=".pdf" onchange="fileChosen('pdf1-input','zone1','fn1','fp1')" />
-        <span class="pdf-badge">PDF</span>
-        <span class="upload-icon">📄</span>
-        <div class="upload-text">Drag & drop your file here or click to browse</div>
-        <div class="upload-filename" id="fn1"></div>
-        <div class="upload-pages" id="fp1"></div>
+    <a href="/merger" class="tool-card purple">
+      <div class="tool-icon">🔀</div>
+      <div class="tool-name">PDF Merger</div>
+      <div class="tool-desc">
+        Combine two PDFs with full control — interleave pages, reverse order, specify custom page ranges, and more using simple text commands.
       </div>
-    </div>
-
-    <div class="card" id="card2">
-      <div class="card-label">Document Two</div>
-      <div class="upload-zone" id="zone2" ondragover="dragover(event,'zone2')" ondragleave="dragleave('zone2')"
-        ondrop="dropit(event,'pdf2-input','zone2')">
-        <input type="file" id="pdf2-input" accept=".pdf" onchange="fileChosen('pdf2-input','zone2','fn2','fp2')" />
-        <span class="pdf-badge">PDF</span>
-        <span class="upload-icon">📄</span>
-        <div class="upload-text">Drag & drop your file here or click to browse</div>
-        <div class="upload-filename" id="fn2"></div>
-        <div class="upload-pages" id="fp2"></div>
+      <div class="tool-tags">
+        <span class="tool-tag">Two PDFs</span>
+        <span class="tool-tag">Commands</span>
+        <span class="tool-tag">Page Ranges</span>
       </div>
-    </div>
+      <div class="tool-launch">Open Tool &rarr;</div>
+    </a>
 
-    <div style="grid-column: 1 / -1;">
-      <button class="btn-upload" id="upload-btn" onclick="uploadFiles()" disabled style="margin-top: 0;">
-        Analyse Documents
-      </button>
-      <div class="status" id="upload-status"></div>
-    </div>
-
-    <div class="card command-card" id="command-card">
-      <div class="command-header">
-        <div class="command-title">Merge Command Terminal</div>
-        <div class="command-hint">Type a command or pick a preset below</div>
+    <a href="/splitter" class="tool-card blue">
+      <div class="tool-icon">✂️</div>
+      <div class="tool-name">PDF Splitter</div>
+      <div class="tool-desc">
+        Split a single PDF into multiple files — individual pages, fixed-size chunks, named ranges, or odd/even pages. Downloads as a ZIP when splitting into multiple parts.
       </div>
-
-      <textarea id="command" rows="2" placeholder="e.g. pdf1:1-3, pdf2:1-2, pdf1:4-end" spellcheck="false"></textarea>
-
-      <div class="presets">
-        <button class="preset-btn" onclick="setCmd('pdf1 pdf2')">PDF1 → PDF2</button>
-        <button class="preset-btn" onclick="setCmd('pdf2 pdf1')">PDF2 → PDF1</button>
-        <button class="preset-btn" onclick="setCmd('interleave')">⇄ Interleave Pages</button>
-        <button class="preset-btn" onclick="setCmd('reverse')">↩ Reverse All</button>
-        <button class="preset-btn" onclick="setCmd('pdf1:1-3, pdf2:1-2')">Custom Range</button>
-        <button class="preset-btn" onclick="setCmd('odd from pdf1, even from pdf2')">Odd/Even Split</button>
-        <button class="preset-btn" onclick="setCmd('only pdf1')">Only PDF1</button>
-        <button class="preset-btn" onclick="setCmd('only pdf2')">Only PDF2</button>
+      <div class="tool-tags">
+        <span class="tool-tag">Single PDF</span>
+        <span class="tool-tag">Ranges</span>
+        <span class="tool-tag">ZIP Output</span>
       </div>
+      <div class="tool-launch">Open Tool &rarr;</div>
+    </a>
 
-      <button class="btn-merge" id="merge-btn" onclick="doMerge()" disabled>
-        EXECUTE MERGE
-        <div class="spinner" id="spinner"></div>
-      </button>
-      <div class="status" id="merge-status"></div>
-    </div>
-
-    <div class="card result-card" id="result-card">
-      <div class="result-header">
-        <div class="result-title">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3"
-            stroke-linecap="round" stroke-linejoin="round">
-            <polyline points="20 6 9 17 4 12"></polyline>
-          </svg>
-          Merge Complete
-        </div>
-        <a class="btn-download" id="download-link" href="#" download>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
-            <polyline points="7 10 12 15 17 10"></polyline>
-            <line x1="12" y1="15" x2="12" y2="3"></line>
-          </svg>
-          Download PDF
-        </a>
+    <a href="/extractor" class="tool-card green">
+      <div class="tool-icon">📑</div>
+      <div class="tool-name">Page Extractor</div>
+      <div class="tool-desc">
+        Pull out specific pages from any PDF into a clean new file. Mix single pages, ranges, and the "end" shortcut — all in one command.
       </div>
-      <div class="result-meta">
-        <div class="meta-item">
-          <div class="meta-key">Total Pages</div>
-          <div class="meta-val" id="r-pages">—</div>
-        </div>
-        <div class="meta-item">
-          <div class="meta-key">Command Used</div>
-          <div class="meta-val" id="r-cmd">—</div>
-        </div>
+      <div class="tool-tags">
+        <span class="tool-tag">Single PDF</span>
+        <span class="tool-tag">Page Ranges</span>
+        <span class="tool-tag">New PDF</span>
       </div>
-    </div>
+      <div class="tool-launch">Open Tool &rarr;</div>
+    </a>
 
-    <div class="card ref-card">
-      <div class="ref-title">Syntax Reference</div>
-      <div class="table-container">
-        <table>
-          <thead>
-            <tr>
-              <th>Command</th>
-              <th>What it does</th>
-              <th>Example</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>pdf1 pdf2</td>
-              <td>All PDF1 pages, then all PDF2 pages (default)</td>
-              <td>pdf1 pdf2</td>
-            </tr>
-            <tr>
-              <td>pdf2 pdf1</td>
-              <td>All PDF2 pages first, then PDF1</td>
-              <td>pdf2 pdf1</td>
-            </tr>
-            <tr>
-              <td>interleave</td>
-              <td>Alternate pages: P1-pg1, P2-pg1, P1-pg2, P2-pg2 …</td>
-              <td>interleave</td>
-            </tr>
-            <tr>
-              <td>reverse</td>
-              <td>Merge both PDFs, then reverse all page order</td>
-              <td>reverse</td>
-            </tr>
-            <tr>
-              <td>pdf1:X-Y, pdf2:A-B</td>
-              <td>Custom page ranges from each PDF. Use 'end' for last page.</td>
-              <td>pdf1:1-3, pdf2:2-end</td>
-            </tr>
-            <tr>
-              <td>odd from pdf1, even from pdf2</td>
-              <td>Odd-numbered pages from PDF1, even-numbered from PDF2</td>
-              <td>odd from pdf1, even from pdf2</td>
-            </tr>
-            <tr>
-              <td>only pdf1</td>
-              <td>Output only PDF1 (useful for extraction)</td>
-              <td>only pdf1</td>
-            </tr>
-          </tbody>
-        </table>
+    <a href="/converter" class="tool-card amber">
+      <div class="tool-icon">🔄</div>
+      <div class="tool-name">File Converter</div>
+      <div class="tool-desc">
+        Convert images (JPG, PNG, WebP…) into PDF — merge multiple images into one document. PPTX and DOCX conversion available when LibreOffice is installed.
       </div>
-    </div>
+      <div class="tool-tags">
+        <span class="tool-tag">JPG/PNG</span>
+        <span class="tool-tag">PPTX</span>
+        <span class="tool-tag">DOCX</span>
+      </div>
+      <div class="tool-launch">Open Tool &rarr;</div>
+    </a>
 
-  </main>
-
-  <footer>
-    Built by Vaibhav Agarwal - 2026
-  </footer>
-
-  <script>
-    // ── State ──
-    let sessionId = null;
-    let pdf1Info = null;
-    let pdf2Info = null;
-
-    // ── File chosen handler ──
-    function fileChosen(inputId, zoneId, fnId, fpId) {
-      const input = document.getElementById(inputId);
-      const zone = document.getElementById(zoneId);
-      const fn = document.getElementById(fnId);
-      const fp = document.getElementById(fpId);
-
-      if (input.files && input.files[0]) {
-        const file = input.files[0];
-        zone.classList.add('loaded');
-        fn.style.display = 'block';
-        fn.textContent = '✓ ' + file.name;
-        fp.style.display = 'block';
-        fp.textContent = (file.size / 1024).toFixed(1) + ' KB';
-        checkBothLoaded();
-      }
-    }
-
-    function checkBothLoaded() {
-      const f1 = document.getElementById('pdf1-input').files[0];
-      const f2 = document.getElementById('pdf2-input').files[0];
-      document.getElementById('upload-btn').disabled = !(f1 && f2);
-    }
-
-    // ── Drag & Drop ──
-    function dragover(e, zoneId) {
-      e.preventDefault();
-      document.getElementById(zoneId).classList.add('dragover');
-    }
-
-    function dragleave(zoneId) {
-      document.getElementById(zoneId).classList.remove('dragover');
-    }
-
-    function dropit(e, inputId, zoneId) {
-      e.preventDefault();
-      dragleave(zoneId);
-      const input = document.getElementById(inputId);
-      const dt = e.dataTransfer;
-      if (dt.files.length) {
-        const file = dt.files[0];
-        if (!file.name.toLowerCase().endsWith('.pdf')) {
-          showStatus('upload-status', 'error', 'Only PDF files are allowed.');
-          return;
-        }
-        // Assign file to input
-        const transfer = new DataTransfer();
-        transfer.items.add(file);
-        input.files = transfer.files;
-        fileChosen(inputId, zoneId,
-          inputId === 'pdf1-input' ? 'fn1' : 'fn2',
-          inputId === 'pdf1-input' ? 'fp1' : 'fp2'
-        );
-      }
-    }
-
-    // ── Upload Files ──
-    async function uploadFiles() {
-      const f1 = document.getElementById('pdf1-input').files[0];
-      const f2 = document.getElementById('pdf2-input').files[0];
-      if (!f1 || !f2) return;
-
-      const btn = document.getElementById('upload-btn');
-      btn.disabled = true;
-      btn.textContent = 'Analysing…';
-      showStatus('upload-status', '', '');
-
-      const formData = new FormData();
-      formData.append('pdf1', f1);
-      formData.append('pdf2', f2);
-
-      try {
-        const res = await fetch('/upload', { method: 'POST', body: formData });
-        const data = await res.json();
-
-        if (data.error) {
-          showStatus('upload-status', 'error', '✗ ' + data.error);
-          btn.disabled = false;
-          btn.textContent = 'Analyse Documents';
-          return;
-        }
-
-        sessionId = data.session_id;
-        pdf1Info = data.pdf1;
-        pdf2Info = data.pdf2;
-
-        // Update UI with page counts
-        document.getElementById('fp1').textContent = pdf1Info.pages + ' pages · ' + (f1.size / 1024).toFixed(1) + ' KB';
-        document.getElementById('fp2').textContent = pdf2Info.pages + ' pages · ' + (f2.size / 1024).toFixed(1) + ' KB';
-
-        showStatus('upload-status', 'success', `✓ Ready — Doc 1: ${pdf1Info.pages} pgs | Doc 2: ${pdf2Info.pages} pgs`);
-
-        btn.textContent = '✓ Documents Analysed';
-        document.getElementById('merge-btn').disabled = false;
-        document.getElementById('command').disabled = false;
-
-      } catch (err) {
-        showStatus('upload-status', 'error', '✗ Network error: ' + err.message);
-        btn.disabled = false;
-        btn.textContent = 'Analyse Documents';
-      }
-    }
-
-    // ── Merge ──
-    async function doMerge() {
-      if (!sessionId) return;
-
-      const command = document.getElementById('command').value.trim() || 'pdf1 pdf2';
-      const btn = document.getElementById('merge-btn');
-      const spinner = document.getElementById('spinner');
-
-      btn.disabled = true;
-      spinner.style.display = 'block';
-      showStatus('merge-status', '', '');
-      document.getElementById('result-card').style.display = 'none';
-
-      try {
-        const res = await fetch('/merge', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ session_id: sessionId, command })
-        });
-        const data = await res.json();
-
-        if (data.error) {
-          showStatus('merge-status', 'error', '✗ ' + data.error);
-        } else {
-          // Show result card
-          const rc = document.getElementById('result-card');
-          rc.style.display = 'block';
-          document.getElementById('r-pages').textContent = data.pages + ' pages';
-          document.getElementById('r-cmd').textContent = command;
-          const dl = document.getElementById('download-link');
-          dl.href = data.download_url;
-          dl.setAttribute('download', 'merged_output.pdf');
-          showStatus('merge-status', 'success', '✓ Merge successful! ' + data.pages + ' pages in output.');
-          rc.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }
-      } catch (err) {
-        showStatus('merge-status', 'error', '✗ Network error: ' + err.message);
-      } finally {
-        btn.disabled = false;
-        spinner.style.display = 'none';
-      }
-    }
-
-    // ── Helpers ──
-    function setCmd(val) {
-      document.getElementById('command').value = val;
-    }
-
-    function showStatus(id, type, msg) {
-      const el = document.getElementById(id);
-      el.className = 'status' + (type ? ' ' + type : '');
-      el.textContent = msg;
-      el.style.display = msg ? 'block' : 'none';
-    }
-
-    // ── Keyboard shortcut: Ctrl+Enter to merge ──
-    document.addEventListener('keydown', (e) => {
-      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') {
-        if (!document.getElementById('merge-btn').disabled) doMerge();
-      }
-    });
-
-    // ── 3D Card Hover Effect Script (Only runs on devices with a mouse) ──
-    if (window.matchMedia("(hover: hover) and (pointer: fine)").matches) {
-      document.querySelectorAll('.card').forEach(card => {
-        card.addEventListener('mousemove', e => {
-          const rect = card.getBoundingClientRect();
-          const x = e.clientX - rect.left;
-          const y = e.clientY - rect.top;
-
-          const centerX = rect.width / 2;
-          const centerY = rect.height / 2;
-
-          const rotateX = ((y - centerY) / centerY) * -5;
-          const rotateY = ((x - centerX) / centerX) * 5;
-
-          card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.02, 1.02, 1.02)`;
-        });
-
-        card.addEventListener('mouseleave', () => {
-          card.style.transform = 'perspective(1000px) rotateX(0deg) rotateY(0deg) scale3d(1, 1, 1)';
-        });
-      });
-    }
-  </script>
-</body>
-
-</html>
+  </div>
+{% endblock %}

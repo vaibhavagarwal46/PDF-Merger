@@ -1,0 +1,237 @@
+{% extends "base.html" %}
+{% block title %}Page Extractor — PDF Tools Your smart editor{% endblock %}
+
+{% block nav_right %}
+  <a href="/" class="nav-back">← All Tools</a>
+{% endblock %}
+
+{% block extra_css %}
+  .hero {
+    position:relative; z-index:10; padding:40px 5% 28px;
+    text-align:center; display:flex; flex-direction:column; align-items:center;
+  }
+  .hero h1 { font-size:clamp(2rem,5vw,4rem); font-weight:800; line-height:1.1; margin-bottom:16px; }
+  .hero h1 span { background:linear-gradient(to right,var(--success),#00ffcc); -webkit-background-clip:text; -webkit-text-fill-color:transparent; }
+  .hero p { color:var(--muted); font-size:clamp(.9rem,2vw,1rem); max-width:560px; line-height:1.6; }
+
+  .range-row { display:flex; gap:14px; align-items:flex-end; }
+  .range-row .cmd-input { flex:1; min-height:56px; resize:none; }
+  @media(max-width:500px){ .range-row{ flex-direction:column; } }
+
+  .page-count-hint {
+    font-size:.8rem; color:var(--muted); margin-top:12px;
+    display:none;
+    font-family:'DM Mono',monospace;
+  }
+{% endblock %}
+
+{% block content %}
+  <div class="hero">
+    <h1>Extract Pages <span>PRECISELY</span><br/>from any PDF</h1>
+    <p>Pick exactly which pages you want and download them as a brand-new PDF. Mix single pages, ranges, and shortcuts freely.</p>
+  </div>
+
+  <main>
+
+    <!-- Upload -->
+    <div class="card full-col">
+      <div class="card-label">Upload PDF</div>
+      <div class="upload-zone" id="zone1"
+           ondragover="dragover(event,'zone1')" ondragleave="dragleave('zone1')"
+           ondrop="dropit(event,'pdf-input','zone1', ()=>fileChosen())">
+        <input type="file" id="pdf-input" accept=".pdf" onchange="fileChosen()" />
+        <span class="file-badge pdf-badge">PDF</span>
+        <span class="upload-icon">📑</span>
+        <div class="upload-text">Drag & drop or click to browse</div>
+        <div class="upload-filename" id="fn"></div>
+        <div class="upload-pages" id="fp"></div>
+      </div>
+      <button class="btn btn-secondary" id="upload-btn" onclick="uploadFile()" disabled>
+        Analyse Document
+      </button>
+      <div class="status" id="upload-status"></div>
+    </div>
+
+    <!-- Range Input -->
+    <div class="card full-col" id="range-card">
+      <div class="card-label">Page Range to Extract</div>
+      <div class="range-row">
+        <textarea id="range-input" class="cmd-input" rows="1"
+                  placeholder="e.g.  1,3,5-8,12-end"
+                  spellcheck="false"></textarea>
+      </div>
+      <div class="page-count-hint" id="page-hint"></div>
+      <div class="presets" style="margin-top:16px;">
+        <button class="preset-btn" onclick="setRange('1')">First Page</button>
+        <button class="preset-btn" id="last-btn" onclick="setLastPage()">Last Page</button>
+        <button class="preset-btn" onclick="setRange('1-5')">First 5</button>
+        <button class="preset-btn" onclick="setRange('1-end')">All Pages</button>
+        <button class="preset-btn" onclick="setRange('1,3,5,7,9')">Odd Pages</button>
+        <button class="preset-btn" onclick="setRange('2,4,6,8,10')">Even Pages</button>
+      </div>
+      <button class="btn btn-primary" id="extract-btn" onclick="doExtract()" disabled
+              style="background:linear-gradient(135deg,#059669,var(--success));">
+        Extract Pages
+        <div class="spinner" id="spinner"></div>
+      </button>
+      <div class="status" id="extract-status"></div>
+    </div>
+
+    <!-- Result -->
+    <div class="card result-card full-col" id="result-card">
+      <div class="result-header">
+        <div class="result-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          Extraction Complete
+        </div>
+        <a class="btn-download" id="download-link" href="#" download="extracted_pages.pdf"
+           style="background:var(--success);">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+          Download PDF
+        </a>
+      </div>
+      <div class="result-meta">
+        <div class="meta-item">
+          <div class="meta-key">Pages Extracted</div>
+          <div class="meta-val" id="r-extracted">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-key">Original Total</div>
+          <div class="meta-val" id="r-total">—</div>
+        </div>
+        <div class="meta-item">
+          <div class="meta-key">Range Used</div>
+          <div class="meta-val" id="r-range">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How to Use -->
+    <div class="card full-col">
+      <div class="ref-title">How to Use — Page Range Syntax</div>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Syntax</th><th>What it selects</th><th>Example</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>N</td><td>Single page number</td><td>5</td></tr>
+            <tr><td>N-M</td><td>All pages from N to M (inclusive)</td><td>3-8</td></tr>
+            <tr><td>N-end</td><td>Page N through the last page</td><td>10-end</td></tr>
+            <tr><td>A,B,C</td><td>Multiple individual pages (comma-separated)</td><td>1,4,7</td></tr>
+            <tr><td>Mixed</td><td>Combine any of the above with commas</td><td>1-3,7,10-end</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <p style="margin-top:16px; font-size:.82rem; color:var(--muted);">
+        <strong>Tip:</strong> Pages are output in the order you specify. Write <code style="color:var(--cyan)">5,3,1</code> to get pages 5, 3, and 1 in that order.
+      </p>
+    </div>
+
+  </main>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  let sessionId = null;
+  let totalPages = 0;
+
+  function fileChosen() {
+    const input = document.getElementById('pdf-input');
+    const zone  = document.getElementById('zone1');
+    const fn    = document.getElementById('fn');
+    const fp    = document.getElementById('fp');
+    if (input.files && input.files[0]) {
+      const f = input.files[0];
+      zone.classList.add('loaded');
+      fn.style.display='block'; fn.textContent='✓ '+f.name;
+      fp.style.display='block'; fp.textContent=(f.size/1024).toFixed(1)+' KB';
+      document.getElementById('upload-btn').disabled=false;
+    }
+  }
+
+  async function uploadFile() {
+    const f = document.getElementById('pdf-input').files[0];
+    if (!f) return;
+
+    const btn = document.getElementById('upload-btn');
+    btn.disabled=true; btn.textContent='Analysing…';
+    showStatus('upload-status','','');
+
+    const fd = new FormData();
+    fd.append('pdf', f);
+
+    try {
+      const res  = await fetch('/extractor/upload', {method:'POST', body:fd});
+      const data = await res.json();
+      if (data.error) {
+        showStatus('upload-status','error','✗ '+data.error);
+        btn.disabled=false; btn.textContent='Analyse Document'; return;
+      }
+      sessionId  = data.session_id;
+      totalPages = data.pages;
+      document.getElementById('fp').textContent = data.pages+' pages · '+(f.size/1024).toFixed(1)+' KB';
+      showStatus('upload-status','success',`✓ Ready — ${data.pages} pages available`);
+      btn.textContent='✓ Analysed';
+      document.getElementById('extract-btn').disabled=false;
+      const hint = document.getElementById('page-hint');
+      hint.style.display='block';
+      hint.textContent = `This PDF has ${data.pages} pages (1 – ${data.pages})`;
+    } catch(err) {
+      showStatus('upload-status','error','✗ Network error: '+err.message);
+      btn.disabled=false; btn.textContent='Analyse Document';
+    }
+  }
+
+  async function doExtract() {
+    if (!sessionId) return;
+    const range = document.getElementById('range-input').value.trim();
+    if (!range) {
+      showStatus('extract-status','error','Please enter a page range first.');
+      return;
+    }
+    const btn     = document.getElementById('extract-btn');
+    const spinner = document.getElementById('spinner');
+
+    btn.disabled=true; spinner.style.display='block';
+    showStatus('extract-status','','');
+    document.getElementById('result-card').style.display='none';
+
+    try {
+      const res  = await fetch('/extractor/extract', {
+        method:'POST', headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({session_id:sessionId, range})
+      });
+      const data = await res.json();
+      if (data.error) {
+        showStatus('extract-status','error','✗ '+data.error);
+      } else {
+        const rc = document.getElementById('result-card');
+        rc.style.display='block';
+        document.getElementById('r-extracted').textContent = data.extracted+' pages';
+        document.getElementById('r-total').textContent     = data.total+' pages';
+        document.getElementById('r-range').textContent     = range;
+        document.getElementById('download-link').href      = data.download_url;
+        showStatus('extract-status','success','✓ Extracted '+data.extracted+' pages successfully!');
+        rc.scrollIntoView({behavior:'smooth', block:'center'});
+      }
+    } catch(err) {
+      showStatus('extract-status','error','✗ Network error: '+err.message);
+    } finally {
+      btn.disabled=false; spinner.style.display='none';
+    }
+  }
+
+  function setRange(v) { document.getElementById('range-input').value = v; }
+  function setLastPage() {
+    if (totalPages > 0) setRange(String(totalPages));
+    else setRange('end');
+  }
+
+  document.addEventListener('keydown', e => {
+    if ((e.ctrlKey||e.metaKey) && e.key==='Enter') {
+      if (!document.getElementById('extract-btn').disabled) doExtract();
+    }
+  });
+</script>
+{% endblock %}
